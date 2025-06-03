@@ -11,7 +11,7 @@ export default async function Dashboard() {
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="flex bg-red-900 items-center justify-between">
+        <div className="flex items-center justify-between">
           {data?.user?.email}
           <LogoutButton />
         </div>
