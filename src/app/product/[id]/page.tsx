@@ -108,21 +108,20 @@ export default async function DetailProductPage({ params }: any) {
                 </CardBody>
                 <Divider />
                 <CardBody>
-                  <div className="flex items-center gap-3">
-                    <MdCheck />
+                  <div className="flex gap-3">
                     <div>
-                      <strong>Full refund</strong> jika pesanan tidak diterima
+                      <MdCheck />
                     </div>
+                    <div>Full refund jika pesanan tidak diterima</div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <MdCheck />
+                  <div className="flex gap-3">
                     <div>
-                      <strong>
-                        Refund atau tetap miliki produk yang tidak sesuai dengan
-                        deskripsi
-                      </strong>{" "}
+                      <MdCheck />
+                    </div>
+                    <div>
                       Refund atau tetap miliki produk yang tidak sesuai dengan
-                      deskripsi
+                      deskripsi Refund atau tetap miliki produk yang tidak
+                      sesuai dengan deskripsi
                     </div>
                   </div>
                 </CardBody>
