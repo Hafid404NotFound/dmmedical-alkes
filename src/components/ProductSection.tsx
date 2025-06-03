@@ -44,7 +44,10 @@ export default function ProductSection() {
           {data.map((item, i) => (
             <Fragment key={i}>
               {i <= 3 && (
-                <div key={i} className="lg:w-full lg:max-xl">
+                <div
+                  key={i}
+                  className="lg:w-full lg:max-xl rounded-2xl lg overflow-hidden"
+                >
                   {item.image_url && (
                     <Image
                       alt={item.name}
