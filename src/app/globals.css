@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "tailwindcss";
+
+html,
+body {
+  font-family:var(--font-inter),sans-serif;
+  background-color: #f9fafb;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-100, currentColor);
+  }
+}
+
+@theme {
+  --color-secondary-main: #49bb99;
+  --color-secondary-dark: #29a081;
+  --color-secondary-light: #80d5b9;
+  --color-base-background: #f9fafb;
+
+  --color-secondary-50: #eefbf6;
+  --color-secondary-100: #d7f4e7;
+  --color-secondary-200: #b2e8d3;
+  --color-secondary-300: #80d5b9;
+  --color-secondary-400: #49bb99;
+  --color-secondary-500: #29a081;
+  --color-secondary-600: #1a8168;
+  --color-secondary-700: #156755;
+  --color-secondary-800: #135244;
+  --color-secondary-900: #104439;
+  --color-secondary-950: #082621;
+
+  --color-primary-main: #163880;
+  --color-primary-dark: #142757;
+  --color-primary-light: #1746b6;
+
+  --color-primary-50: #eef7ff;
+  --color-primary-100: #d9ecff;
+  --color-primary-200: #bcdfff;
+  --color-primary-300: #8eccff;
+  --color-primary-400: #58aeff;
+  --color-primary-500: #328dff;
+  --color-primary-600: #1b6cf5;
+  --color-primary-700: #1457e1;
+  --color-primary-800: #1746b6;
+  --color-primary-900: #163880;
+  --color-primary-950: #142757;
+
+  --spacing-sidebar-width: 339px;
+  --spacing-top-bar-height: 60px;
+  --spacing-top-home-height: 120px;
+  --spacing-field-height: 34px;
+}
+
+.ck-editor {
+  .ck-toolbar {
+    border-radius: 10px 10px 0 0 !important;
+  }
+  .ck-toolbar {
+    border-radius: 10px 10px 0 0 !important;
+  }
+  .ck-editor__editable {
+    > * {
+      margin-top: 20px;
+    }
+  }
+
+  .ck-editor__main {
+    .ck-content {
+      border-radius: 0 0 10px 10px !important;
+      min-height: 400px !important;
+    }
+  }
+}
+
+.ck-sticky-panel__content_sticky {
+  background-color: palegoldenrod !important;
+  transform: translateY(80px);
+}
+
+.error-editor {
+  .ck-toolbar {
+    background-color: rgba(255, 0, 0, 0.05) !important;
+  }
+
+  .ck-content {
+    background-color: rgba(255, 0, 0, 0.05) !important;
+  }
+}
+
+.edit_ck,
+.ck-content {
+  ul,
+  ol {
+    margin-left: 24px;
+  }
+}
