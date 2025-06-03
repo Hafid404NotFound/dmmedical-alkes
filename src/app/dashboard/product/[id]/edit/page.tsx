@@ -132,7 +132,7 @@ export default function EditProduct({
     }
   }, [data]);
 
-  useEffect(() => {
+  useEffect(() => {  
     supabase
       .from("category")
       .select()
