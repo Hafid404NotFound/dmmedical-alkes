@@ -11,6 +11,7 @@ import { IProduct } from "@/types/IProduct";
 import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 import Link from "next/link";
+import { MdWhatsapp } from "react-icons/md";
 
 export default async function DetailProductPage({ params }: any) {
   const supabase = createClient();
@@ -80,7 +81,7 @@ export default async function DetailProductPage({ params }: any) {
                           width={50}
                           className="h-10 w-auto"
                         />
-                        <div className="text-white">Beli via tokopedia</div>
+                        <div className="text-white">Beli via Shoppe</div>
                       </div>
                     </Link>
                   )}
@@ -100,10 +101,8 @@ export default async function DetailProductPage({ params }: any) {
                   )}
                   {data.wa_link && (
                     <Link target="_blank" href={data.wa_link}>
-                      <div className="bg-pink-300 flex items-center gap-3 px-4">
-                        <Image
-                          src={"/bukalapak.png"}
-                          alt="bukalaopan"
+                      <div className="bg-green-600 flex items-center gap-3 px-4">
+                        <MdWhatsapp
                           height={50}
                           width={50}
                           className="h-10 w-auto"
