@@ -20,7 +20,8 @@ export default function Home() {
   return (
     <div
       className="lg:bg-primary-main lg:h-[80vh] lg:max-w-full max-w-xl"
-      id="home">
+      id="home"
+    >
       <ActionButtonWa />
       <div className="h-[20%]  text-white flex items-center ">
         <TopBar />
@@ -32,7 +33,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex items-center justify-star w-full ">
-          <div className="bg-white scale-75 p-8 lg:rounded-3xl rounded-4xl flex flex-col gap-10 w-full lg:-translate-x-56">
+          <div className="bg-white scale-75 p-8 lg:rounded-3xl rounded-4xl flex flex-col gap-10 w-full lg:-translate-x-56 shadow-[4px_0_10px_4px_rgba(0,0,0,0.25)]">
             <div className="grid  lg:grid-cols-2">
               <div className="border-l h-full border-black py-4 gap-3 grid">
                 {dataListHomeOverview.map((item, i) => (
@@ -43,7 +44,8 @@ export default function Home() {
                       i === 0 && "bg-[#979797] w-full ",
                       i === 2 && "bg-secondary-main w-[60%] ",
                       i === 1 && "bg-[#CCCCCC] text-black w-[80%]"
-                    )}>
+                    )}
+                  >
                     <div className="flex items-center gap-3">
                       {i === 2 && (
                         <Image
