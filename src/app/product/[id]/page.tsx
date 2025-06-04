@@ -50,7 +50,7 @@ export default async function DetailProductPage({ params }: any) {
             <div className="mt-3 grid grid-cols-2 gap-3">
               {data.tokopedia_link && (
                 <Link target="_blank" href={data.tokopedia_link}>
-                  <div className="bg-[#4D9E0B] flex items-center gap-3 px-4 border border-gray-300 rounded-md">
+                  <div className="bg-[#4D9E0B] flex items-center gap-3 px-4 border border-gray-300 rounded-md md:px-6 sm:px-4">
                     <Image
                       src={"/1tokopedia.png"}
                       alt="tokopedia"
@@ -64,7 +64,7 @@ export default async function DetailProductPage({ params }: any) {
               )}
               {data.shopee_link && (
                 <Link target="_blank" href={data.shopee_link}>
-                  <div className="bg-[#DA9B3D] flex items-center gap-3 px-4 border border-gray-300 rounded-md">
+                  <div className="bg-[#DA9B3D] flex items-center gap-3 px-4 border border-gray-300 rounded-md md:px-6 sm:px-4">
                     <Image
                       src={"/shopee.png"}
                       alt="tokopedia"
@@ -92,7 +92,7 @@ export default async function DetailProductPage({ params }: any) {
               )}
               {data.wa_link && (
                 <Link target="_blank" href={data.wa_link}>
-                  <div className="bg-green-600 flex items-center gap-3 px-4 border border-gray-300 rounded-md">
+                  <div className="bg-green-600 flex items-center gap-3 px-4 border border-gray-300 rounded-md md:px-6 sm:px-4">
                     <MdWhatsapp className="text-white text-3xl h-10" />
                     <div className="text-white">Beli via Whatsapp</div>
                   </div>
