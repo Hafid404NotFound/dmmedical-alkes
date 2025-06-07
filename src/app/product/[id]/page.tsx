@@ -27,23 +27,41 @@ export default async function DetailProductPage({ params }: any) {
       <TopBar />
 
       <PageContainer>
-        <div className="lg:grid lg:grid-cols-2 gap-12 mt-20">
-          {/* Video Section */}
-          <div className="w-full">
-            <div className="relative z-[99] w-full h-auto aspect-video rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300">
-              <ParallaxScrollScrubVideo value={data.video_url} />
-            </div>
+        <div className="lg:grid lg:grid-cols-2 gap-4 sm:gap-8 lg:gap-12 mt-12 sm:mt-16 lg:mt-20">
+          {/* Media Section - Video or Image */}
+          <div className="w-full space-y-4 sm:space-y-6">
+            {data.video_url ? (
+              <div className="relative w-full overflow-hidden bg-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="aspect-video">
+                  <ParallaxScrollScrubVideo value={data.video_url} />
+                </div>
+              </div>
+            ) : data.image_url ? (
+              <div className="relative w-full overflow-hidden bg-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="aspect-video">
+                  <Image
+                    src={data.image_url}
+                    alt={data.name || "Product image"}
+                    width={1280}
+                    height={720}
+                    className="w-full h-full object-contain"
+                    priority
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                  />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* Content Section */}
-          <div className="flex-1 lg:pl-4 mt-8 lg:mt-0 space-y-8">
-            <div className="space-y-4">
+          <div className="flex-1 lg:pl-4 mt-8 lg:mt-0 space-y-6 sm:space-y-8">
+            <div className="space-y-3 sm:space-y-4">
               {data.category && (
-                <div className="text-primary-main/80 font-medium">
+                <div className="text-primary-main/80 font-medium text-sm sm:text-base">
                   {data.category.name}
                 </div>
               )}
-              <h1 className="text-4xl font-semibold text-gray-800 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 leading-tight">
                 {data.name}
               </h1>
             </div>
@@ -54,16 +72,18 @@ export default async function DetailProductPage({ params }: any) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {data.tokopedia_link && (
-                <Link target="_blank" href={data.tokopedia_link}>
-                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <Image
-                      src="/1tokopedia.png"
-                      alt="tokopedia"
-                      height={50}
-                      width={50}
-                      className="h-10 w-auto"
-                    />
-                    <div className="text-white font-medium">
+                <Link target="_blank" href={data.tokopedia_link} className="block">
+                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-8 sm:w-10 flex-shrink-0">
+                      <Image
+                        src="/1tokopedia.png"
+                        alt="tokopedia"
+                        height={50}
+                        width={50}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via Tokopedia
                     </div>
                   </div>
@@ -71,16 +91,18 @@ export default async function DetailProductPage({ params }: any) {
               )}
 
               {data.shopee_link && (
-                <Link target="_blank" href={data.shopee_link}>
-                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <Image
-                      src="/shopee.png"
-                      alt="shopee"
-                      height={50}
-                      width={50}
-                      className="h-10 w-auto"
-                    />
-                    <div className="text-white font-medium">
+                <Link target="_blank" href={data.shopee_link} className="block">
+                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-8 sm:w-10 flex-shrink-0">
+                      <Image
+                        src="/shopee.png"
+                        alt="shopee"
+                        height={50}
+                        width={50}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via Shopee
                     </div>
                   </div>
@@ -88,10 +110,10 @@ export default async function DetailProductPage({ params }: any) {
               )}
 
               {data.wa_link && (
-                <Link target="_blank" href={data.wa_link}>
-                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <MdWhatsapp className="text-white text-3xl" />
-                    <div className="text-white font-medium">
+                <Link target="_blank" href={data.wa_link} className="block">
+                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <MdWhatsapp className="text-white text-2xl sm:text-3xl flex-shrink-0" />
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via WhatsApp
                     </div>
                   </div>
@@ -99,27 +121,28 @@ export default async function DetailProductPage({ params }: any) {
               )}
             </div>
 
-            <div className="space-y-6">
+            {/* Cards Section */}
+            <div className="space-y-4 sm:space-y-6">
               <Card className="hover:shadow-lg transition-all duration-300">
-                <CardBody className="p-6">
+                <CardBody className="p-4 sm:p-6">
                   <div className="flex gap-3 items-center text-primary-main">
-                    <MdStarOutline className="text-2xl" />
-                    <h3 className="font-semibold text-lg">
+                    <MdStarOutline className="text-xl sm:text-2xl" />
+                    <h3 className="font-semibold text-base sm:text-lg">
                       Perlindungan Pembeli
                     </h3>
                   </div>
                 </CardBody>
                 <Divider />
-                <CardBody className="p-6 space-y-4">
+                <CardBody className="p-4 sm:p-6 space-y-4">
                   <div className="flex gap-3 items-start group">
-                    <MdCheck className="text-green-500 text-xl mt-1 flex-shrink-0" />
-                    <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+                    <MdCheck className="text-green-500 text-lg sm:text-xl mt-1 flex-shrink-0" />
+                    <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300 text-sm sm:text-base">
                       Full refund jika pesanan tidak diterima
                     </div>
                   </div>
                   <div className="flex gap-3 items-start group">
-                    <MdCheck className="text-green-500 text-xl mt-1 flex-shrink-0" />
-                    <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+                    <MdCheck className="text-green-500 text-lg sm:text-xl mt-1 flex-shrink-0" />
+                    <div className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300 text-sm sm:text-base">
                       Refund atau tetap miliki produk yang tidak sesuai dengan
                       deskripsi
                     </div>
@@ -128,16 +151,16 @@ export default async function DetailProductPage({ params }: any) {
               </Card>
 
               <Card className="hover:shadow-lg transition-all duration-300">
-                <CardBody className="p-6">
-                  <h3 className="font-semibold text-lg text-primary-main">
+                <CardBody className="p-4 sm:p-6">
+                  <h3 className="font-semibold text-base sm:text-lg text-primary-main">
                     Untuk Info Hubungi:
                   </h3>
                 </CardBody>
                 <Divider />
-                <CardBody className="p-6">
+                <CardBody className="p-4 sm:p-6">
                   <div className="flex items-center gap-3 group">
-                    <MdWhatsapp className="text-green-500 text-xl" />
-                    <p className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300">
+                    <MdWhatsapp className="text-green-500 text-lg sm:text-xl flex-shrink-0" />
+                    <p className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300 text-sm sm:text-base">
                       0895366450806 (Bekasi)
                     </p>
                   </div>
