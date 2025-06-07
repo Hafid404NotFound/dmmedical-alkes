@@ -1,21 +1,19 @@
 "use client";
 
 import { Card, CardBody } from "@/components/Card";
-import { Line, Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
 import { format, subDays } from "date-fns";
-import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
 // Register ChartJS components
 ChartJS.register(
@@ -23,7 +21,6 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   Title,
   Tooltip,
   Legend
@@ -35,79 +32,10 @@ interface AnalyticsData {
   visitors: number;
 }
 
-interface LoginData {
-  id: string;
-  type: string;
-  date: string;
-  count: number;
-}
-
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top" as const,
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        precision: 0,
-      },
-    },
-  },
-};
-
 export default function DashboardAnalytics() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
-  const [loginData, setLoginData] = useState<LoginData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
-
-  const fetchAnalyticsData = useCallback(
-    async (
-      startDate: Date,
-      endDate: Date,
-      attempt = 1
-    ): Promise<AnalyticsData[]> => {
-      try {
-        const response = await fetch("/api/analytics", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            startDate: format(startDate, "yyyy-MM-dd") + "T00:00:00.000Z",
-            endDate: format(endDate, "yyyy-MM-dd") + "T23:59:59.999Z",
-          }),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok && result.retryNeeded && attempt < 3) {
-          // Wait for progressively longer times between retries
-          await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
-          return fetchAnalyticsData(startDate, endDate, attempt + 1);
-        }
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to fetch analytics data");
-        }
-
-        return result;
-      } catch (error) {
-        console.error(`Analytics fetch attempt ${attempt} failed:`, error);
-        if (attempt < 3) {
-          await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
-          return fetchAnalyticsData(startDate, endDate, attempt + 1);
-        }
-        throw error;
-      }
-    },
-    []
-  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,42 +43,35 @@ export default function DashboardAnalytics() {
         setIsLoading(true);
         setError(null);
 
+        // Get date range for last 7 days
         const endDate = new Date();
         const startDate = subDays(endDate, 6);
 
-        const [analyticsResult, loginResult] = await Promise.all([
-          fetchAnalyticsData(startDate, endDate),
-          supabase
-            .from("analytics")
-            .select("*")
-            .eq("type", "login")
-            .gte("date", format(startDate, "yyyy-MM-dd"))
-            .order("date", { ascending: true }),
-        ]);
+        const response = await fetch("/api/analytics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            startDate: format(startDate, "yyyy-MM-dd"),
+            endDate: format(endDate, "yyyy-MM-dd"),
+          }),
+        });
 
-        setAnalyticsData(analyticsResult);
-
-        if (loginResult.error) {
-          console.error("Login data error:", loginResult.error);
-        } else {
-          setLoginData(loginResult.data || []);
-        }
+        const data = await response.json();
+        setAnalyticsData(data);
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Terjadi kesalahan saat memuat data"
-        );
+        console.error("Error fetching analytics:", err);
+        setError("Failed to load analytics data");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [fetchAnalyticsData]);
+  }, []);
 
-  const visitorChartData = {
+  const chartData = {
     labels: analyticsData.map((item) => format(new Date(item.date), "dd MMM")),
     datasets: [
       {
@@ -170,29 +91,22 @@ export default function DashboardAnalytics() {
     ],
   };
 
-  const loginChartData = {
-    labels: loginData.map((item) => format(new Date(item.date), "dd MMM")),
-    datasets: [
-      {
-        label: "Login Admin",
-        data: loginData.map((item) => item.count),
-        backgroundColor: "rgba(75, 192, 192, 0.5)",
-        borderColor: "rgb(75, 192, 192)",
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
       },
-    ],
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+        },
+      },
+    },
   };
-
-  const totalVisitors = analyticsData.reduce(
-    (acc, curr) => acc + curr.visitors,
-    0
-  );
-  const totalPageViews = analyticsData.reduce(
-    (acc, curr) => acc + curr.pageViews,
-    0
-  );
-  const averageDailyVisitors = Math.round(
-    totalVisitors / Math.max(analyticsData.length, 1)
-  );
 
   if (isLoading) {
     return (
@@ -214,25 +128,25 @@ export default function DashboardAnalytics() {
       <div className="p-4">
         <Card>
           <CardBody>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-red-500 mb-2">Error</h3>
-              <p className="text-gray-600">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-4 px-4 py-2 bg-primary-main text-white rounded-lg hover:bg-primary-dark transition-colors"
-              >
-                Coba Lagi
-              </button>
-            </div>
+            <div className="text-red-500">{error}</div>
           </CardBody>
         </Card>
       </div>
     );
   }
 
+  const totalVisitors = analyticsData.reduce(
+    (sum, item) => sum + item.visitors,
+    0
+  );
+  const totalPageViews = analyticsData.reduce(
+    (sum, item) => sum + item.pageViews,
+    0
+  );
+
   return (
     <div className="p-4 space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardBody>
             <h3 className="text-lg font-semibold mb-2">
@@ -240,9 +154,6 @@ export default function DashboardAnalytics() {
             </h3>
             <p className="text-3xl font-bold text-primary-main">
               {totalVisitors}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Rata-rata {averageDailyVisitors} per hari
             </p>
           </CardBody>
         </Card>
@@ -252,20 +163,6 @@ export default function DashboardAnalytics() {
             <p className="text-3xl font-bold text-secondary-main">
               {totalPageViews}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Total halaman yang dilihat
-            </p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <h3 className="text-lg font-semibold mb-2">Total Login Admin</h3>
-            <p className="text-3xl font-bold text-emerald-600">
-              {loginData.reduce((acc, curr) => acc + curr.count, 0)}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Total login dalam 7 hari
-            </p>
           </CardBody>
         </Card>
       </div>
@@ -273,14 +170,7 @@ export default function DashboardAnalytics() {
       <Card>
         <CardBody>
           <h3 className="text-lg font-semibold mb-4">Statistik Pengunjung</h3>
-          <Line data={visitorChartData} options={chartOptions} />
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody>
-          <h3 className="text-lg font-semibold mb-4">Statistik Login Admin</h3>
-          <Bar data={loginChartData} options={chartOptions} />
+          <Line data={chartData} options={options} />
         </CardBody>
       </Card>
     </div>
