@@ -42,12 +42,6 @@ export default async function Dashboard() {
             </div>
             <LogoutButton />
           </div>
-
-          {/* Recent Activity Section */}
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h2>
-            <RecentActivity />
-          </div>
         </div>
       </DashboardContainer>
     </DashboardLayout>

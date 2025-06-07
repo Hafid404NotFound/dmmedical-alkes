@@ -37,46 +37,38 @@ export default function DashboardAnalytics() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnalytics = async () => {
-    try {
-      setError(null);
-
-      // Get date range for last 7 days
-      const endDate = new Date();
-      const startDate = subDays(endDate, 6);
-
-      const response = await fetch("/api/analytics", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          startDate: format(startDate, "yyyy-MM-dd"),
-          endDate: format(endDate, "yyyy-MM-dd"),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch analytics data");
-      }
-
-      const data = await response.json();
-      setAnalyticsData(data);
-    } catch (err) {
-      console.error("Error fetching analytics:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load analytics"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchAnalytics();
-    // Poll every 5 minutes for fresh data
-    const interval = setInterval(fetchAnalytics, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Get date range for last 7 days
+        const endDate = new Date();
+        const startDate = subDays(endDate, 6);
+
+        const response = await fetch("/api/analytics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            startDate: format(startDate, "yyyy-MM-dd"),
+            endDate: format(endDate, "yyyy-MM-dd"),
+          }),
+        });
+
+        const data = await response.json();
+        setAnalyticsData(data);
+      } catch (err) {
+        console.error("Error fetching analytics:", err);
+        setError("Failed to load analytics data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const chartData = {
@@ -90,7 +82,7 @@ export default function DashboardAnalytics() {
         tension: 0.1,
       },
       {
-        label: "Page Views",
+        label: "Total Views",
         data: analyticsData.map((item) => item.pageViews),
         borderColor: "rgb(54, 162, 235)",
         backgroundColor: "rgba(54, 162, 235, 0.5)",
@@ -104,10 +96,6 @@ export default function DashboardAnalytics() {
     plugins: {
       legend: {
         position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Statistik Website (Real-time)",
       },
     },
     scales: {
@@ -124,6 +112,11 @@ export default function DashboardAnalytics() {
     return (
       <div className="p-4">
         <div className="animate-pulse space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="h-24 bg-gray-200 rounded-lg"></div>
+            <div className="h-24 bg-gray-200 rounded-lg"></div>
+          </div>
+          <div className="h-64 bg-gray-200 rounded-lg"></div>
           <div className="h-64 bg-gray-200 rounded-lg"></div>
         </div>
       </div>
@@ -135,15 +128,7 @@ export default function DashboardAnalytics() {
       <div className="p-4">
         <Card>
           <CardBody>
-            <div className="text-center">
-              <p className="text-red-500 mb-4">{error}</p>
-              <button
-                onClick={fetchAnalytics}
-                className="px-4 py-2 bg-primary-main text-white rounded-lg hover:bg-primary-dark"
-              >
-                Coba Lagi
-              </button>
-            </div>
+            <div className="text-red-500">{error}</div>
           </CardBody>
         </Card>
       </div>
@@ -170,7 +155,6 @@ export default function DashboardAnalytics() {
             <p className="text-3xl font-bold text-primary-main">
               {totalVisitors}
             </p>
-            <p className="text-sm text-gray-500 mt-1">7 hari terakhir</p>
           </CardBody>
         </Card>
         <Card>
@@ -179,19 +163,13 @@ export default function DashboardAnalytics() {
             <p className="text-3xl font-bold text-secondary-main">
               {totalPageViews}
             </p>
-            <p className="text-sm text-gray-500 mt-1">7 hari terakhir</p>
           </CardBody>
         </Card>
       </div>
 
       <Card>
         <CardBody>
-          <div className="mb-4 flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Statistik Kunjungan</h3>
-            <span className="text-sm text-gray-500">
-              Update terakhir: {format(new Date(), "HH:mm:ss")}
-            </span>
-          </div>
+          <h3 className="text-lg font-semibold mb-4">Statistik Pengunjung</h3>
           <Line data={chartData} options={options} />
         </CardBody>
       </Card>

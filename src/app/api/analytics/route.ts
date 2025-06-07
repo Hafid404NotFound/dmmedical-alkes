@@ -1,65 +1,93 @@
 import { NextResponse } from "next/server";
-import { analyticsConfig, getApiHeaders } from "@/utils/analytics-config";
+import {
+  analyticsConfig,
+  getApiHeaders,
+  isAnalyticsEnabled,
+} from "@/utils/analytics-config";
+
+// Generate sample data for development or when analytics is not configured
+function generateDemoData(startDate: string, endDate: string) {
+  const data = [];
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const current = new Date(start);
+
+  while (current <= end) {
+    data.push({
+      date: current.toISOString().split("T")[0],
+      pageViews: Math.floor(Math.random() * 100),
+      visitors: Math.floor(Math.random() * 50),
+    });
+    current.setDate(current.getDate() + 1);
+  }
+  return data;
+}
 
 export async function POST(request: Request) {
   try {
     const { startDate, endDate } = await request.json();
 
-    // Log request details
-    console.log("Fetching analytics for:", { startDate, endDate });
+    // For development or when analytics is not configured, return demo data
+    if (!isAnalyticsEnabled()) {
+      console.log("Analytics not configured, using demo data");
+      return NextResponse.json(generateDemoData(startDate, endDate));
+    }
 
-    // Define the API URL for Web Analytics (using v2 API)
-    const baseUrl = "https://api.vercel.com";
-    const statsEndpoint = "/v2/stats";
+    // Log configuration for debugging
+    console.log("Analytics config:", {
+      hasToken: !!analyticsConfig.token,
+      projectId: analyticsConfig.projectId,
+      environment: analyticsConfig.environment,
+    });
 
-    // Get project stats
-    const statsUrl = `${baseUrl}${statsEndpoint}?from=${startDate}&to=${endDate}&projectId=${analyticsConfig.projectId}`;
+    // Define the API URL for Web Analytics
+    const apiUrl = new URL(`${analyticsConfig.baseUrl}/v1/web/analytics/stats`);
+    apiUrl.searchParams.append("projectId", analyticsConfig.projectId);
+    apiUrl.searchParams.append("from", startDate);
+    apiUrl.searchParams.append("to", endDate);
 
-    console.log("Fetching from:", statsUrl);
+    console.log("Fetching analytics from:", apiUrl.toString());
 
-    const response = await fetch(statsUrl, {
+    const response = await fetch(apiUrl, {
       headers: getApiHeaders(),
-      next: { revalidate: 0 }, // Disable cache to get fresh data
+      next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Vercel API Error:", {
+      console.error("Analytics API error response:", {
         status: response.status,
-        text: errorText,
-        url: statsUrl,
+        statusText: response.statusText,
+        body: errorText,
       });
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Analytics API error: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
     console.log("Raw analytics data:", data);
 
-    // Get detailed page views
-    const pageViewsUrl = `${baseUrl}/v2/web-analytics/page-views?from=${startDate}&to=${endDate}&projectId=${analyticsConfig.projectId}`;
-    const pageViewsResponse = await fetch(pageViewsUrl, {
-      headers: getApiHeaders(),
-      next: { revalidate: 0 },
-    });
-
-    const pageViewsData = await pageViewsResponse.json();
-    console.log("Page views data:", pageViewsData);
-
-    // Transform and combine the data
-    const transformedData = pageViewsData.pageViews
-      .map((item: any) => ({
-        date: new Date(item.timestamp).toISOString().split("T")[0],
-        pageViews: item.value || 0,
-        visitors: item.uniques || 0,
+    // Transform the data into our expected format
+    const transformedData = Object.entries(data.pageviews || {})
+      .map(([date, pageViews]) => ({
+        date,
+        pageViews: Number(pageViews) || 0,
+        visitors: Number(data.uniques?.[date]) || 0,
       }))
-      .sort((a: any, b: any) => a.date.localeCompare(b.date));
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     return NextResponse.json(transformedData);
   } catch (error) {
     console.error("Analytics API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+
+    // In case of error in production, return empty data
+    // In development, return demo data
+    if (process.env.NODE_ENV === "development") {
+      const { startDate, endDate } = await request.json();
+      return NextResponse.json(generateDemoData(startDate, endDate));
+    }
+
+    return NextResponse.json([]);
   }
 }
