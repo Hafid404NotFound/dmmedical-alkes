@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
+import { trackAdminLogin } from "@/utils/supabase/analytics";
 
 export async function login(e: any) {
   const supabase = await createClient();
@@ -21,19 +22,7 @@ export async function login(e: any) {
   }
 
   // Track admin login
-  const today = new Date().toISOString().split("T")[0];
-  await supabase.from("analytics").upsert(
-    {
-      type: "login",
-      date: today,
-      count: 1,
-      created_at: new Date().toISOString(),
-    },
-    {
-      onConflict: "type,date",
-      ignoreDuplicates: false,
-    }
-  );
+  await trackAdminLogin();
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
