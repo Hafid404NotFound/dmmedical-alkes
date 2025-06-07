@@ -72,7 +72,8 @@ export default function SidebarDashboard() {
               <div className="flex gap-2 items-center ">
                 <div
                   onClick={handleLogout}
-                  className="h-4 w-4 rounded-full bg-[#F8625D] cursor-pointer"></div>
+                  className="h-4 w-4 rounded-full bg-[#F8625D] cursor-pointer"
+                ></div>
                 <div className="h-4 w-4 rounded-full bg-[#F7BB3F]"></div>
                 <div className="h-4 w-4 rounded-full bg-[#34C749]"></div>
               </div>
@@ -90,13 +91,15 @@ export default function SidebarDashboard() {
         <div
           className={`fixed top-0 h-screen duration-700 border-r w-sidebar-width  bg-white ${
             show ? "translate-x-0" : "lg:translate-x-0 -translate-x-96"
-          }`}>
+          }`}
+        >
           <div className="h-top-bar-height border-b px-4 flex items-center">
             <div className="flex h-full text-xl font-semibold gap-2 text-primary-main">
               <div className="flex gap-2 items-center flex-1">
                 <div
                   onClick={handleLogout}
-                  className="h-4 w-4 rounded-full bg-[#F8625D] cursor-pointer"></div>
+                  className="h-4 w-4 rounded-full bg-[#F8625D] cursor-pointer"
+                ></div>
                 <div className="h-4 w-4 rounded-full bg-[#F7BB3F]"></div>
                 <div className="h-4 w-4 rounded-full bg-[#34C749]"></div>
               </div>
