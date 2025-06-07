@@ -17,7 +17,16 @@ import { FormikProvider, useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { MdLocalHospital, MdMedicalServices, MdSave } from "react-icons/md";
+import {
+  MdLocalHospital,
+  MdMedicalServices,
+  MdSave,
+  MdLink,
+  MdDescription,
+  MdCategory,
+  MdDriveFileRenameOutline,
+  MdCloudUpload, // Added for media section consistency
+} from "react-icons/md";
 
 export default function EditProduct({
   params,
@@ -40,21 +49,34 @@ export default function EditProduct({
         .from("product")
         .select()
         .eq("id", id)
-        .then((query) => {
-          const getdata: IProduct[] = query?.data || [];
-          if (getdata[0]) {
-            setData(getdata[0]);
-            setEditorLoaded(true);
+        .single() // Use single to get one record or null
+        .then(({ data: productData, error }) => {
+          if (error) {
+            console.error("Error fetching product:", error);
+            toast.error("Gagal memuat data produk.");
+            // router.push("/dashboard/product"); // Optional: redirect if product not found or error
+            return;
+          }
+          if (productData) {
+            setData(productData as IProduct);
+            setEditorLoaded(true); // Assuming editor depends on this data
+          } else {
+            toast.error("Produk tidak ditemukan.");
+            // router.push("/dashboard/product"); // Optional: redirect
           }
         });
     }
-  }, [id]);
+  }, [id, supabase, router]); // Added supabase and router to dependency array
 
   const handleEdit = async (e: IReqCreateNewProduct) => {
     setLoading(true);
     try {
       const idCategory = await onCreateCategory(e.category_id);
-      if (!idCategory) return;
+      if (!idCategory) {
+        toast.error("Kategori tidak valid.");
+        setLoading(false);
+        return;
+      }
       const { error } = await supabase
         .from("product")
         .update({
@@ -62,14 +84,15 @@ export default function EditProduct({
           category_id: idCategory,
         })
         .eq("id", id);
-      setLoading(false);
+
       if (error) throw error;
       toast.success("Produk berhasil diupdate");
       router.push("/dashboard/product/" + id);
     } catch (error) {
-      setLoading(false);
       toast.error("Gagal update produk");
-      console.error("Insert error:", error);
+      console.error("Update error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,84 +107,107 @@ export default function EditProduct({
     tokopedia_link: "",
     wa_link: "",
   };
+
   const formik = useFormik({
     initialValues: initValue,
     onSubmit: (e) => handleEdit(e),
+    enableReinitialize: true, // Important for re-populating form when `data` changes
   });
 
   async function onCreateCategory(e: string) {
-    const { data } = await supabase
-      .from("category")
-      .select()
-      .eq("id", parseInt(e));
-
-    if (data?.[0]) {
-      return data[0].id;
-    } else {
-      const { data, error } = await supabase
+    // Check if e is a valid number (existing category ID)
+    if (!isNaN(parseInt(e))) {
+      const { data: existingCategory, error: fetchError } = await supabase
         .from("category")
-        .insert([{ name: e }])
-        .select();
+        .select("id")
+        .eq("id", parseInt(e))
+        .single();
 
-      if (error) {
-        console.error("Insert error:", error);
+      if (fetchError && fetchError.code !== "PGRST116") {
+        // PGRST116: "Searched item was not found"
+        console.error("Error fetching category:", fetchError);
         return null;
       }
-
-      if (data && data.length > 0) {
-        return data[0].id;
-      } else {
-        console.warn("No data returned after insert.");
-        return null;
+      if (existingCategory) {
+        return existingCategory.id;
       }
     }
+
+    // If not a valid existing ID, or if it's a new category name (string)
+    // Try to find by name first if it's a string that might match an existing name
+    const { data: namedCategory, error: namedFetchError } = await supabase
+      .from("category")
+      .select("id")
+      .ilike("name", e) // Case-insensitive match
+      .single();
+
+    if (namedFetchError && namedFetchError.code !== "PGRST116") {
+      console.error("Error fetching category by name:", namedFetchError);
+    }
+    if (namedCategory) {
+      return namedCategory.id;
+    }
+
+    // If still not found, insert as new category
+    const { data: newCategoryData, error: insertError } = await supabase
+      .from("category")
+      .insert([{ name: e }])
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("Insert category error:", insertError);
+      return null;
+    }
+    return newCategoryData?.id || null;
   }
 
   useEffect(() => {
     if (data) {
       formik.setValues({
-        description: data.description,
-        image_url: data.image_url,
-        name: data.name,
-        bukalapak_link: data.bukalapak_link,
-        wa_link: data.wa_link,
-        category_id: data.category_id,
-        tokopedia_link: data.tokopedia_link,
-        shopee_link: data.shopee_link,
-        video_url: data.video_url,
+        description: data.description || "",
+        image_url: data.image_url || "",
+        name: data.name || "",
+        bukalapak_link: data.bukalapak_link || "",
+        wa_link: data.wa_link || "",
+        category_id: String(data.category_id) || "", // Ensure category_id is a string for Autocomplete
+        tokopedia_link: data.tokopedia_link || "",
+        shopee_link: data.shopee_link || "",
+        video_url: data.video_url || "",
       });
     }
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]); // formik instance is stable, setValues is also stable
 
   useEffect(() => {
     supabase
       .from("category")
-      .select()
+      .select("id, name")
       .then((e) => {
         if (e.data) {
-          const data: ILabelValue<string>[] = e.data.map((v) => {
-            return {
-              label: String(v?.name),
-              value: String(v?.id),
-            };
-          });
-          setDataCategory(data);
+          const categories: ILabelValue<string>[] = e.data.map((v) => ({
+            label: String(v?.name),
+            value: String(v?.id),
+          }));
+          setDataCategory(categories);
         }
       });
-  }, []);
+  }, [supabase]); // Added supabase to dependency array
+
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
-                <MdLocalHospital className="text-2xl text-white" />
+        <div className="space-y-6 sm:space-y-8">
+          {/* Page Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg shrink-0">
+                <MdLocalHospital className="text-xl sm:text-2xl text-white" />
               </div>
               <div>
                 <PageTitle title="Edit Alat Kesehatan" />
-                <p className="text-gray-500 text-sm">
-                  Perbarui informasi dan spesifikasi alat kesehatan
+                <p className="text-gray-500 text-xs sm:text-sm">
+                  Perbarui informasi dan spesifikasi alat kesehatan Anda.
                 </p>
               </div>
             </div>
@@ -170,22 +216,24 @@ export default function EditProduct({
           <FormikProvider value={formik}>
             <Card>
               <CardBody>
-                <div className="grid gap-6">
+                <div className="flex flex-col gap-6 sm:gap-8">
                   {/* Media Section */}
-                  <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-                    <div className="flex items-center gap-2 text-primary-main font-medium mb-2">
-                      <MdMedicalServices className="text-xl" />
-                      Media Alat Kesehatan
+                  <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
+                      <MdCloudUpload className="text-xl sm:text-2xl" />
+                      <h2 className="text-base sm:text-lg">
+                        Media Alat Kesehatan
+                      </h2>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-5">
                       Upload foto dan video yang menampilkan detail alat
-                      kesehatan dengan jelas
+                      kesehatan dengan jelas.
                     </p>
 
-                    <div className="grid gap-6">
-                      <div className="p-4 border border-gray-100 rounded-lg bg-gray-50/50">
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                          Video Demonstrasi
+                    <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
+                          Video Demonstrasi (Link YouTube/Vimeo)
                         </label>
                         <VidioUplaoded
                           value={formik.values.video_url}
@@ -193,9 +241,9 @@ export default function EditProduct({
                         />
                       </div>
 
-                      <div className="p-4 border border-gray-100 rounded-lg bg-gray-50/50">
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                          Foto Produk
+                      <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
+                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
+                          Foto Produk Utama
                         </label>
                         <UploadBoxCropperArea
                           folderName="POST"
@@ -207,92 +255,108 @@ export default function EditProduct({
                     </div>
                   </div>
 
-                  {/* Product Info */}
-                  <div className="grid gap-4">
-                    <InputText
-                      label="Nama Alat Kesehatan"
-                      placeholder="Contoh: Stetoskop Digital Premium / Tensimeter Otomatis"
-                      id="name"
-                      name="name"
-                      required
-                    />
-
-                    {dataCategory.length > 0 && (
-                      <InputAutocompleteOptional
-                        name="category_id"
-                        placeholder="Contoh: Alat Diagnostik / Peralatan Bedah"
-                        label="Kategori Alat Kesehatan"
+                  {/* Product Info Section */}
+                  <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
+                      <MdMedicalServices className="text-xl sm:text-2xl" />
+                      <h2 className="text-base sm:text-lg">
+                        Informasi Dasar Produk
+                      </h2>
+                    </div>
+                    <div className="grid gap-4 sm:gap-5">
+                      <InputText
+                        label="Nama Alat Kesehatan"
+                        placeholder="Contoh: Stetoskop Digital Premium"
+                        id="name"
+                        name="name"
                         required
-                        options={dataCategory || []}
+                        startIcon={
+                          <MdDriveFileRenameOutline className="text-gray-400" />
+                        }
                       />
-                    )}
+
+                      {dataCategory.length > 0 && (
+                        <InputAutocompleteOptional
+                          name="category_id"
+                          placeholder="Pilih atau buat kategori baru"
+                          label="Kategori Alat Kesehatan"
+                          required
+                          options={dataCategory}
+                          value={formik.values.category_id}
+                          onChange={(option) =>
+                            formik.setFieldValue(
+                              "category_id",
+                              option ? option : ""
+                            )
+                          }
+                        />
+                      )}
+                    </div>
                   </div>
 
-                  {/* Marketplace Links */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 text-gray-700 font-medium mb-4">
-                      <svg
-                        className="w-5 h-5 text-secondary-main"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                        />
-                      </svg>
-                      Link Pembelian
+                  {/* Marketplace Links Section */}
+                  <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
+                      <MdLink className="text-xl sm:text-2xl" />
+                      <h2 className="text-base sm:text-lg">
+                        Link Pembelian (Opsional)
+                      </h2>
                     </div>
-
+                    <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-5">
+                      Tambahkan link ke halaman produk Anda di berbagai
+                      marketplace.
+                    </p>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <InputText
                         label="WhatsApp"
-                        placeholder="Link konsultasi & pemesanan via WhatsApp"
+                        placeholder="Contoh: https://wa.me/62..."
                         id="wa_link"
                         name="wa_link"
-                        required
+                        // required // Kept as per original, but consider if truly required
                       />
                       <InputText
                         label="Tokopedia"
-                        placeholder="Link pembelian di Tokopedia"
+                        placeholder="Contoh: https://tokopedia.com/..."
                         id="tokopedia_link"
                         name="tokopedia_link"
-                        required
+                        // required
                       />
                       <InputText
                         label="Shopee"
-                        placeholder="Link pembelian di Shopee"
+                        placeholder="Contoh: https://shopee.co.id/..."
                         id="shopee_link"
                         name="shopee_link"
-                        required
+                        // required
                       />
                       <InputText
                         label="Bukalapak"
-                        placeholder="Link pembelian di Bukalapak"
+                        placeholder="Contoh: https://bukalapak.com/..."
                         id="bukalapak_link"
                         name="bukalapak_link"
-                        required
+                        // required
                       />
                     </div>
                   </div>
 
-                  {/* Description Editor */}
+                  {/* Description Editor Section */}
                   {editorLoaded && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700 block">
-                        Spesifikasi & Detail Produk
-                      </label>
-                      <div className="text-sm text-gray-500 mb-2">
-                        Jelaskan spesifikasi teknis, manfaat, dan cara
-                        penggunaan alat kesehatan secara detail
+                    <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
+                        <MdDescription className="text-xl sm:text-2xl" />
+                        <h2 className="text-base sm:text-lg">
+                          Spesifikasi & Detail Produk
+                        </h2>
                       </div>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
+                        Jelaskan spesifikasi teknis, manfaat, dan cara
+                        penggunaan alat kesehatan secara detail.
+                      </p>
                       <InputEditor
                         editorLoaded={editorLoaded}
                         name="description"
-                        onChange={(e) => formik.setFieldValue("description", e)}
+                        onChange={(data) =>
+                          formik.setFieldValue("description", data)
+                        }
                         value={formik.values.description}
                       />
                     </div>
@@ -301,9 +365,9 @@ export default function EditProduct({
                   <Button
                     loading={loading}
                     onClick={() => formik.handleSubmit()}
-                    className="bg-primary-main hover:bg-primary-dark text-white font-medium py-3 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto sm:self-end bg-primary-main hover:bg-primary-dark text-white font-semibold py-2.5 sm:py-3 px-6 rounded-lg flex items-center justify-center gap-2 text-sm sm:text-base transition-colors duration-150 shadow-md hover:shadow-lg"
                   >
-                    <MdSave className="text-xl" />
+                    <MdSave className="text-lg sm:text-xl" />
                     Simpan Perubahan
                   </Button>
                 </div>
