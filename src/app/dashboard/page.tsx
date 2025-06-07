@@ -3,16 +3,18 @@
 import DashboardContainer from "@/components/DashboardContainer";
 import DashboardLayout from "@/components/DashboardLayout";
 import LogoutButton from "@/components/LogoutButton";
-import DashboardAnalytics from "@/components/DashboardAnalytics";
+import RecentActivity from "@/components/RecentActivity";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Dashboard() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
+
   return (
     <DashboardLayout>
       <DashboardContainer>
         <div className="space-y-6">
+          {/* Header Section */}
           <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
@@ -41,7 +43,11 @@ export default async function Dashboard() {
             <LogoutButton />
           </div>
 
-          <DashboardAnalytics />
+          {/* Recent Activity Section */}
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-lg font-semibold mb-4">Aktivitas Terbaru</h2>
+            <RecentActivity />
+          </div>
         </div>
       </DashboardContainer>
     </DashboardLayout>
