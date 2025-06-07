@@ -26,8 +26,8 @@ export default function Home() {
       <div className="h-[12%] sm:h-[15%] text-white flex items-center">
         <TopBar />
       </div>{" "}
-      <div className="grid lg:grid-cols-2 bg-primary-main flex-1 h-[100%] py-8">
-        <div className="bg-primary-main relative overflow-hidden w-full rounded-tr-[45px] sm:rounded-tr-[60px] lg:rounded-tr-[90px] flex items-center justify-center z-10">
+      <div className="grid lg:grid-cols-2 bg-gradient-to-b from-primary-main to-secondary-main flex-1 h-[100%] py-8">
+        <div className="bg-transparent relative overflow-hidden w-full rounded-tr-[45px] sm:rounded-tr-[60px] lg:rounded-tr-[90px] flex items-center justify-center z-10 lg:ml-30 ">
           {/* Medical equipment decorative elements */}
           <div className="absolute top-4 left-4 w-8 h-8 border-2 border-white/10 rounded-full flex items-center justify-center">
             <div className="w-4 h-4 border-2 border-white/10 rounded-full"></div>
