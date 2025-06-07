@@ -1,5 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client";
+
+import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 interface CKeditorProps {
   onChange: (data: string) => void;
@@ -13,47 +16,30 @@ export default function InputEditor({
   editorLoaded,
   value,
 }: CKeditorProps) {
-  const [ClassicEditor, setClassicEditor] = useState<any>(undefined);
-
-  useEffect(() => {
-    import("@ckeditor/ckeditor5-build-classic").then((mod) => {
-      setClassicEditor(() => mod.default);
-    });
-  }, []);
-  const editorRef: any = useRef(undefined);
-  useEffect(() => {
-    editorRef.current = {
-      CKEditor: require("@ckeditor/ckeditor5-react").CKEditor,
-      ClassicEditor: require("@ckeditor/ckeditor5-build-classic"),
-    };
-  }, []);
+  if (!editorLoaded) {
+    return <div>Editor loading</div>;
+  }
 
   return (
-    <>
-      {editorLoaded && ClassicEditor ? (
-        <CKEditor
-          editor={ClassicEditor as any}
-          data={value}
-          onChange={(event: any, editor: any) => {
-            const data = editor.getData();
-            onChange(data);
-          }}
-          config={{
-            toolbar: [
-              "heading",
-              "|",
-              "bold",
-              "italic",
-              "link",
-              "bulletedList",
-              "numberedList",
-              "blockQuote",
-            ],
-          }}
-        />
-      ) : (
-        <div>Editor loading</div>
-      )}
-    </>
+    <CKEditor
+      editor={ClassicEditor as any}
+      data={value}
+      onChange={(_event: any, editor: any) => {
+        const data = editor.getData();
+        onChange(data);
+      }}
+      config={{
+        toolbar: [
+          "heading",
+          "|",
+          "bold",
+          "italic",
+          "link",
+          "bulletedList",
+          "numberedList",
+          "blockQuote",
+        ],
+      }}
+    />
   );
 }

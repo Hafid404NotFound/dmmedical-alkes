@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 
-export default function AnalyticsTracker() {
+function AnalyticsContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -35,4 +35,12 @@ export default function AnalyticsTracker() {
   }, [pathname, searchParams]);
 
   return null;
+}
+
+export default function AnalyticsTracker() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyticsContent />
+    </Suspense>
+  );
 }

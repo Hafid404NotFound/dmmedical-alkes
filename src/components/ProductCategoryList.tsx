@@ -1,7 +1,7 @@
 "use client";
 import { ICategory } from "@/types/ICategory";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense } from "react";
 import { twMerge } from "tailwind-merge";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
@@ -9,7 +9,7 @@ import { ListGroup, ListItem } from "./List";
 import { MdArrowCircleDown, MdArrowDownward, MdClose } from "react-icons/md";
 import { div } from "framer-motion/client";
 
-export default function ProductCategoryList(props: IProps) {
+function ProductCategoryListContent(props: IProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const category = searchParams.get("category"); // will be "5"
@@ -64,6 +64,14 @@ export default function ProductCategoryList(props: IProps) {
         />
       )}
     </div>
+  );
+}
+
+export default function ProductCategoryList(props: IProps) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductCategoryListContent {...props} />
+    </Suspense>
   );
 }
 
