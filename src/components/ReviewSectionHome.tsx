@@ -77,9 +77,14 @@ export default function ReviewSectionHome() {
     <div className="py-16 md:py-24 bg-slate-50 dark:bg-gray-900/70">
       <PageContainer>
         <style>{swiperStyles}</style>
-        <h2 className="text-center text-3xl md:text-4xl font-semibold pb-12 md:pb-16 text-gray-800 dark:text-white">
-          Testimoni & Kepercayaan Pelanggan
-        </h2>
+        <div className="flex flex-col items-center text-center">
+          <div className="relative mb-6">
+            <h2 className="text-4xl font-bold text-primary-main inline-block">
+              Testimoni & Kepercayaan Pelanggan
+            </h2>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-secondary-main/30 rounded-full"></div>
+          </div>
+        </div>
 
         <div className="relative">
           <Swiper
@@ -134,10 +139,10 @@ export default function ReviewSectionHome() {
             {!loading &&
               data.map((item) => (
                 <SwiperSlide key={item.id}>
-                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden min-h-[250px] h-full flex flex-col border-t-4 border-sky-500 dark:border-sky-400 group hover:shadow-2xl transition-shadow duration-300">
+                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden min-h-[250px] h-full flex flex-col border-t-4 border-primary-main dark:border-primary-main group hover:shadow-2xl transition-shadow duration-300">
                     <div className="p-6 flex-grow flex flex-col">
                       <div className="flex items-start mb-4">
-                        <MdCheckCircle className="w-10 h-10 text-sky-500 dark:text-sky-400 mr-3 shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                        <MdCheckCircle className="w-10 h-10 text-primary-main dark:text-sky-400 mr-3 shrink-0 group-hover:scale-110 transition-transform duration-300" />
                         <div className="flex-1">
                           <p className="font-semibold text-gray-800 dark:text-white text-lg">
                             {item.name}
