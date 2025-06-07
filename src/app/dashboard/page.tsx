@@ -3,7 +3,7 @@
 import DashboardContainer from "@/components/DashboardContainer";
 import DashboardLayout from "@/components/DashboardLayout";
 import LogoutButton from "@/components/LogoutButton";
-import RecentActivity from "@/components/RecentActivity";
+
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Dashboard() {
@@ -13,14 +13,14 @@ export default async function Dashboard() {
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Header Section */}
-          <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-3 sm:p-4 rounded-xl shadow-md gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white"
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -34,13 +34,17 @@ export default async function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-                <p className="text-gray-500">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+                  Dashboard
+                </h1>
+                <p className="text-sm sm:text-base text-gray-500">
                   Selamat datang, {data?.user?.email}
                 </p>
               </div>
             </div>
-            <LogoutButton />
+            <div className="w-full sm:w-auto">
+              <LogoutButton className="w-full sm:w-auto" />
+            </div>
           </div>
         </div>
       </DashboardContainer>

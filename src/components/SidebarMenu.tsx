@@ -8,10 +8,12 @@ export default function SidebarMenu(props: IProps) {
     <Link
       href={props.path || ""}
       className={twMerge(
-        " rounded-md py-2 px-4 capitalize active:border-primary-main border border-transparent flex items-center gap-2 text-gray-500  hover:bg-primary-main/10 duration-200",
-        props.active ? " text-primary-dark" : ""
-      )}>
-      <Icon className={"text-2xl "} />
+        "rounded-md py-2 px-4 capitalize active:border-primary-main border border-transparent flex items-center gap-2 text-gray-500 hover:bg-primary-main/10 duration-200",
+        props.active ? "text-primary-dark bg-primary-main/5" : ""
+      )}
+      onClick={props.onClick}
+    >
+      <Icon className="text-xl sm:text-2xl" />
       <div>{props.label}</div>
     </Link>
   );
@@ -19,7 +21,8 @@ export default function SidebarMenu(props: IProps) {
 
 interface IProps {
   path?: string;
-  label: string;
   icon: IconType;
+  label: string;
   active?: boolean;
+  onClick?: () => void;
 }
