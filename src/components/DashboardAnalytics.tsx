@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { format, eachDayOfInterval, subDays } from "date-fns";
+import { format, subDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -31,13 +31,13 @@ ChartJS.register(
 
 interface AnalyticsData {
   date: string;
-  count: number;
-  type: string;
+  pageViews: number;
+  visitors: number;
 }
 
 export default function DashboardAnalytics() {
-  const [visitorData, setVisitorData] = useState<AnalyticsData[]>([]);
-  const [loginData, setLoginData] = useState<AnalyticsData[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [loginData, setLoginData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
 
@@ -48,48 +48,34 @@ export default function DashboardAnalytics() {
         const endDate = new Date();
         const startDate = subDays(endDate, 6);
 
-        // Generate all dates in range
-        const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
-        const dateStrings = dateRange.map((date) => format(date, "yyyy-MM-dd"));
-
-        // Fetch analytics data
-        const [visitorResult, loginResult] = await Promise.all([
-          supabase
-            .from("analytics")
-            .select("*")
-            .eq("type", "visit")
-            .gte("date", format(startDate, "yyyy-MM-dd"))
-            .order("date", { ascending: true }),
-          supabase
-            .from("analytics")
-            .select("*")
-            .eq("type", "login")
-            .gte("date", format(startDate, "yyyy-MM-dd"))
-            .order("date", { ascending: true }),
-        ]);
-
-        // Process visitor data with zero-filling
-        const processedVisitorData = dateStrings.map((date) => {
-          const record = visitorResult.data?.find((item) => item.date === date);
-          return {
-            date,
-            count: record?.count || 0,
-            type: "visit",
-          };
+        // Fetch Vercel Analytics data
+        const response = await fetch("/api/analytics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            startDate: format(startDate, "yyyy-MM-dd"),
+            endDate: format(endDate, "yyyy-MM-dd"),
+          }),
         });
 
-        // Process login data with zero-filling
-        const processedLoginData = dateStrings.map((date) => {
-          const record = loginResult.data?.find((item) => item.date === date);
-          return {
-            date,
-            count: record?.count || 0,
-            type: "login",
-          };
-        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch analytics data");
+        }
 
-        setVisitorData(processedVisitorData);
-        setLoginData(processedLoginData);
+        const data = await response.json();
+        setAnalyticsData(data);
+
+        // Fetch login data from Supabase
+        const { data: logins } = await supabase
+          .from("analytics")
+          .select("*")
+          .eq("type", "login")
+          .gte("date", format(startDate, "yyyy-MM-dd"))
+          .order("date", { ascending: true });
+
+        setLoginData(logins || []);
       } catch (error) {
         console.error("Error fetching analytics:", error);
       } finally {
@@ -123,14 +109,22 @@ export default function DashboardAnalytics() {
   };
 
   const visitorChartData = {
-    labels: visitorData.map((item) => format(new Date(item.date), "dd MMM")),
+    labels: analyticsData.map((item) => format(new Date(item.date), "dd MMM")),
     datasets: [
       {
         label: "Pengunjung Website",
-        data: visitorData.map((item) => item.count),
+        data: analyticsData.map((item) => item.visitors),
         fill: false,
         borderColor: "rgb(75, 192, 192)",
         backgroundColor: "rgba(75, 192, 192, 0.5)",
+        tension: 0.1,
+      },
+      {
+        label: "Page Views",
+        data: analyticsData.map((item) => item.pageViews),
+        fill: false,
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
         tension: 0.1,
       },
     ],
@@ -172,6 +166,15 @@ export default function DashboardAnalytics() {
     );
   }
 
+  const totalVisitors = analyticsData.reduce(
+    (acc, curr) => acc + curr.visitors,
+    0
+  );
+  const totalPageViews = analyticsData.reduce(
+    (acc, curr) => acc + curr.pageViews,
+    0
+  );
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
@@ -182,9 +185,19 @@ export default function DashboardAnalytics() {
           <div className="h-80">
             <Line data={visitorChartData} options={chartOptions} />
           </div>
-          <div className="mt-4 text-center text-sm text-gray-600">
-            Total Pengunjung:{" "}
-            {visitorData.reduce((acc, curr) => acc + curr.count, 0)}
+          <div className="mt-4 grid grid-cols-2 gap-4 text-center text-sm">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <div className="font-semibold text-blue-600">
+                Total Pengunjung
+              </div>
+              <div className="text-blue-900">{totalVisitors}</div>
+            </div>
+            <div className="p-2 bg-green-50 rounded-lg">
+              <div className="font-semibold text-green-600">
+                Total Page Views
+              </div>
+              <div className="text-green-900">{totalPageViews}</div>
+            </div>
           </div>
         </CardBody>
       </Card>
