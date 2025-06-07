@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { analyticsConfig, getApiHeaders, isAnalyticsEnabled } from "@/utils/analytics-config";
+import {
+  analyticsConfig,
+  getApiHeaders,
+  isAnalyticsEnabled,
+} from "@/utils/analytics-config";
 
 // Generate sample data for development or when analytics is not configured
 function generateDemoData(startDate: string, endDate: string) {
@@ -50,7 +54,9 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
-      throw new Error(`Analytics API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Analytics API error: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
