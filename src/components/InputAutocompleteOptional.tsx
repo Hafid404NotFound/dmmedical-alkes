@@ -14,9 +14,6 @@ interface IProps {
   value?: string;
   onChange?: (value?: string) => void;
   errorMessage?: string;
-  labelClassName?: string; // Added prop
-  inputClassName?: string; // Added prop
-  containerClassName?: string; // Added prop
 }
 
 export default function InputAutocompleteOptional(props: IProps) {
@@ -79,17 +76,11 @@ export default function InputAutocompleteOptional(props: IProps) {
   };
 
   return (
-    <div
-      className={twMerge("w-full relative", props.containerClassName)}
-      ref={containerRef}
-    >
+    <div className="w-full relative" ref={containerRef}>
       {props.label && (
         <label
           htmlFor={props.name}
-          className={twMerge(
-            "block mb-1 font-medium text-sm text-gray-700",
-            props.labelClassName
-          )} // Apply labelClassName
+          className="block mb-1 font-medium text-sm text-gray-700"
         >
           {props.label}{" "}
           {props.required && <span className="text-red-600">*</span>}
@@ -109,8 +100,7 @@ export default function InputAutocompleteOptional(props: IProps) {
         className={twMerge(
           "w-full border rounded-sm px-3 py-2 text-sm outline-none",
           error ? "border-red-500 bg-red-50" : "border-gray-300 bg-white",
-          props.disabled && "bg-gray-100 text-gray-400 cursor-not-allowed",
-          props.inputClassName // Apply inputClassName
+          props.disabled && "bg-gray-100 text-gray-400 cursor-not-allowed"
         )}
       />
       {error && <p className="text-xs text-red-600 mt-1">{error as string}</p>}

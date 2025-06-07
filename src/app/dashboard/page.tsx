@@ -3,7 +3,7 @@
 import DashboardContainer from "@/components/DashboardContainer";
 import DashboardLayout from "@/components/DashboardLayout";
 import LogoutButton from "@/components/LogoutButton";
-
+import RecentActivity from "@/components/RecentActivity";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Dashboard() {
@@ -15,12 +15,12 @@ export default async function Dashboard() {
       <DashboardContainer>
         <div className="space-y-6">
           {/* Header Section */}
-          <div className="flex items-center justify-between bg-white p-2 sm:p-4 rounded-xl shadow-md">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 sm:h-5 sm:w-5 text-white"
+                  className="h-6 w-6 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -34,10 +34,8 @@ export default async function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-base sm:text-xl font-bold text-gray-800">
-                  Dashboard
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-500">
+                <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+                <p className="text-gray-500">
                   Selamat datang, {data?.user?.email}
                 </p>
               </div>
