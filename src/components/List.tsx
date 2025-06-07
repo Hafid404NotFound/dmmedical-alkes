@@ -8,7 +8,14 @@ export function ListGroup(props: IPropsGroup) {
   return (
     <Card>
       <CardBody className={"p-1 grid gap-1  min-w-[140px] "}>
-        <div className={"cursor-pointer"}>{props.children}</div>
+        <div
+          className={twMerge(
+            "border border-gray-200 rounded-lg overflow-hidden",
+            props.className
+          )}
+        >
+          {props.children}
+        </div>
       </CardBody>
     </Card>
   );
@@ -17,12 +24,11 @@ export function ListGroup(props: IPropsGroup) {
 export function ListItem(props: IPropsItem) {
   return (
     <div
-      {...props}
-      onClick={props.onClick && props.onClick}
+      onClick={props.onClick}
       className={twMerge(
-        " rounded-md py-2 px-4 capitalize active:border-primary-main/20 border border-transparent flex items-center gap-2 text-gray-500 hover:bg-primary-main/10 duration-200",
-        props.active ? "text-primary-light" : "",
-        props?.className
+        "rounded-md py-2 px-4 capitalize active:border-primary-main/20 border border-transparent flex items-center gap-2 text-gray-500 hover:bg-primary-main/10 duration-200",
+        Boolean(props.active) ? "text-primary-light bg-primary-50" : "",
+        props.className
       )}
     >
       {props.icon && props.icon}
@@ -41,4 +47,5 @@ interface IPropsItem {
 
 interface IPropsGroup {
   children?: React.ReactNode;
+  className?: string;
 }

@@ -16,10 +16,24 @@ export async function login(e: any) {
   };
 
   const { error } = await supabase.auth.signInWithPassword(data);
-
   if (error) {
     redirect("/error");
   }
+
+  // Track admin login
+  const today = new Date().toISOString().split("T")[0];
+  await supabase.from("analytics").upsert(
+    {
+      type: "login",
+      date: today,
+      count: 1,
+      created_at: new Date().toISOString(),
+    },
+    {
+      onConflict: "type,date",
+      ignoreDuplicates: false,
+    }
+  );
 
   revalidatePath("/", "layout");
   redirect("/dashboard");

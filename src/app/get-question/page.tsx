@@ -11,6 +11,8 @@ import { createClient } from "@/utils/supabase/client";
 import { FormikProvider, useFormik } from "formik";
 import Image from "next/image";
 import { useState } from "react";
+import { MdMail, MdPhone, MdPinDrop } from "react-icons/md";
+import { IoLogoWhatsapp } from "react-icons/io";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 
@@ -54,56 +56,86 @@ export default function GetQuestionPage() {
   };
 
   return (
-    <div className="bg-gradient-to-bl from-primary-main to-secondary-main min-h-screen">
+    <div className="relative bg-gradient-to-bl from-primary-main to-secondary-main min-h-screen">
       <ActionButtonWa />
+      {/* Background decoration */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-light/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary-light/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+      </div>
 
       <Toaster position="bottom-center" />
       <TopBar transparent />
-      <div className="pb-10 lg:mt-0 mt-12  ">
+
+      <div className="relative pb-10 lg:mt-0 mt-12">
         <PageContainer>
-          <div className="lg:mt-10  gap-7">
-            <div>
-              <div className="font-semibold mb-4 text-4xl text-white">
-                Get question
-              </div>
+          <div className="lg:mt-10 gap-7">
+            <div className="mb-8">
+              <h1 className="font-semibold text-4xl lg:text-5xl text-white mb-4 animate-fade-in">
+                Get Question
+              </h1>
+              <div className="w-20 h-1 bg-white/30 rounded-full"></div>
             </div>
-            <div className=" lg:flex mt-2 lg:mt-0 bg-white rounded-3xl overflow-hidden">
-              <div className="bg-gray-100  lg:w-md p-7 flex flex-col items-center">
-                <Image
-                  src={"/question_1.png"}
-                  width={200}
-                  height={200}
-                  alt="question"
-                  className="h-40 w-auto"
-                />
-                <div className="text-start mt-10 grid gap-3">
-                  <p className="font-semibold ">DM MEDICAL ALKES</p>
-                  <div className="grid gap-2">
-                    <p>
-                      Kp.Bojong Tua, Jl. Masjid Al-Ikhlas RT 003/RW 001 (Blok B
-                      No.18), Pondok Gede.
-                    </p>
-                    <p>Telp: +62-21-78838951</p>
-                    <p>WA: +62-812-8877-0321</p>
-                    <p>E-mail: marketing@kp3.co.id</p>
+
+            <div className="lg:flex mt-2 lg:mt-0 bg-white/95 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl transform hover:scale-[1.01] transition-all duration-500">
+              <div className="bg-gray-100/90 backdrop-blur-sm lg:w-md p-8 flex flex-col items-center relative overflow-hidden">
+                <div className="relative transform hover:scale-105 transition-all duration-500">
+                  <Image
+                    src="/question_1.png"
+                    width={200}
+                    height={200}
+                    alt="question"
+                    className="h-40 w-auto drop-shadow-xl"
+                  />
+                </div>
+
+                <div className="text-start mt-10 grid gap-4">
+                  <h2 className="font-semibold text-xl text-primary-main">
+                    DM MEDICAL ALKES
+                  </h2>
+                  <div className="grid gap-3 text-gray-600">
+                    <div className="flex items-start gap-3 group hover:text-primary-main transition-colors duration-300">
+                      <MdPinDrop className="mt-1 text-xl text-primary-main" />
+                      <p>
+                        Kp.Bojong Tua, Jl. Masjid Al-Ikhlas RT 003/RW 001 (Blok
+                        B No.18), Pondok Gede.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
+                      <MdPhone className="text-xl text-primary-main" />
+                      <p>+62-21-78838951</p>
+                    </div>
+                    <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
+                      <IoLogoWhatsapp className="text-xl text-primary-main" />
+                      <p>+62-812-8877-0321</p>
+                    </div>
+                    <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
+                      <MdMail className="text-xl text-primary-main" />
+                      <p>marketing@kp3.co.id</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="lg:p-20 p-3 ">
-                <div className="bg-gray-100 rounded-lg p-8 mt-10 lg:mt-0">
-                  <p className="text-center text-xl mb-5">
+
+              <div className="lg:p-20 p-6 flex-1">
+                <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-8 shadow-lg">
+                  <h3 className="text-center text-xl mb-8 text-gray-700 font-medium">
                     Silakan isi formulir di bawah ini untuk menjelaskan
                     kebutuhan Anda terkait produk Dm Medical!
-                  </p>
-                  <div>
-                    <FormikProvider value={formik}>
-                      <div className="grid gap-6 h-fit">
-                        <div className=" flex items-center font-semibold gap-3">
-                          <div className="h-8 w-8 text-white flex items-center justify-center rounded-t-lg rounded-br-lg bg-primary-main">
-                            1
-                          </div>
-                          <p>Informasi Kontak</p>
+                  </h3>
+
+                  <FormikProvider value={formik}>
+                    <div className="grid gap-8 h-fit">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 text-white flex items-center justify-center rounded-xl bg-primary-main shadow-lg">
+                          <span className="font-medium">1</span>
                         </div>
+                        <h4 className="font-semibold text-gray-700">
+                          Informasi Kontak
+                        </h4>
+                      </div>
+
+                      <div className="space-y-6">
                         <InputText
                           label="Nama"
                           placeholder="Nama anda"
@@ -125,12 +157,18 @@ export default function GetQuestionPage() {
                           name="phone"
                           required
                         />
-                        <div className=" flex items-center font-semibold gap-3">
-                          <div className="h-8 w-8 text-white flex items-center justify-center rounded-t-lg rounded-br-lg bg-primary-main">
-                            2
-                          </div>
-                          <p> Informasi Tambahan</p>
+                      </div>
+
+                      <div className="flex items-center gap-3 mt-4">
+                        <div className="h-10 w-10 text-white flex items-center justify-center rounded-xl bg-primary-main shadow-lg">
+                          <span className="font-medium">2</span>
                         </div>
+                        <h4 className="font-semibold text-gray-700">
+                          Informasi Tambahan
+                        </h4>
+                      </div>
+
+                      <div className="space-y-6">
                         <InputTextarea
                           label="Pesan"
                           placeholder="Masukan pesan"
@@ -141,12 +179,13 @@ export default function GetQuestionPage() {
                         <Button
                           loading={loading}
                           onClick={() => formik.handleSubmit()}
+                          className="w-full py-3 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
                         >
                           KIRIM
                         </Button>
                       </div>
-                    </FormikProvider>
-                  </div>
+                    </div>
+                  </FormikProvider>
                 </div>
               </div>
             </div>
