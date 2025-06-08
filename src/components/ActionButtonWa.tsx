@@ -21,9 +21,7 @@ export default function ActionButtonWa() {
       .string()
       .email("Format email tidak valid")
       .required("Email wajib diisi"),
-    hospital: yup
-      .string()
-      .required("Rumah sakit/Perusahaan wajib diisi"),
+    hospital: yup.string().required("Rumah sakit/Perusahaan wajib diisi"),
   });
 
   const formik = useFormik({
@@ -121,8 +119,8 @@ export default function ActionButtonWa() {
               <div>
                 <div className="text-xl sm:text-2xl font-bold">Halo!</div>
                 <div className="max-w-[240px] sm:max-w-xs text-xs sm:text-sm mt-2 opacity-90">
-                  Ada yang bisa kami bantu? Konsultasikan kebutuhan Anda dengan tim
-                  kami via WhatsApp.
+                  Ada yang bisa kami bantu? Konsultasikan kebutuhan Anda dengan
+                  tim kami via WhatsApp.
                 </div>
               </div>
               <button
@@ -162,10 +160,7 @@ export default function ActionButtonWa() {
   }
 
   return (
-    <div
-      className="fixed bottom-5 right-5"
-      style={{ zIndex: 999 }}
-    >
+    <div className="fixed bottom-5 right-5" style={{ zIndex: 999 }}>
       <AnimatePresence mode="wait">
         {active && (checkStep === 0 ? firstStep() : nextStep())}
       </AnimatePresence>
