@@ -9,23 +9,47 @@ import Link from "next/link";
 
 export default function ProductSection() {
   const [data, setData] = useState<IProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   useEffect(() => {
-    supabase
-      .from("product")
-      .select(
-        `
-    *,
-    category (
-      id,
-      name
-    )
-  `
-      )
-      .then((e) => {
-        setData(e.data as any);
-      });
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching products...");
+
+        const { data: products, error } = await supabase.from("product")
+          .select(`
+            *,
+            category (
+              id,
+              name
+            )
+          `);
+
+        if (error) {
+          console.error("Supabase error:", error);
+          setError(`Database error: ${error.message}`);
+          return;
+        }
+
+        console.log(
+          "Products fetched successfully:",
+          products?.length || 0,
+          "products"
+        );
+        setData(products || []);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to connect to database");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [supabase]);
 
   return (
     <div
@@ -47,89 +71,158 @@ export default function ProductSection() {
         <p className="text-sm sm:text-base text-gray-600 text-center max-w-2xl mx-auto mt-2">
           Discover our premium selection of medical equipment, designed to meet
           the highest standards of quality and reliability
-        </p>
+        </p>{" "}
       </div>
       <PageContainer>
-        <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-full px-4 sm:px-0">
-          {data.map((item, i) => (
-            <Fragment key={i}>
-              {i <= 3 && (
-                <div className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="relative">
-                    {item.image_url && (
-                      <div className="relative aspect-square overflow-hidden">
-                        <Image
-                          alt={item.name}
-                          width={400}
-                          src={item.image_url}
-                          height={400}
-                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          quality={90}
-                          priority={i <= 3} // Load first 4 images immediately
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-3 sm:p-4">
-                    {item.category?.name && (
-                      <p className="text-xs sm:text-sm text-secondary-main font-medium mb-1 sm:mb-2">
-                        {item?.category?.name}
-                      </p>
-                    )}
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2 mb-2 sm:mb-3 group-hover:text-primary-main transition-colors">
-                      {item.name}
-                    </h3>
-                    <Link
-                      href={`/product/${item.id}`}
-                      className="inline-flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-primary-main font-medium hover:text-secondary-main transition-colors"
-                    >
-                      View Details
-                      <svg
-                        className="w-3 h-3 sm:w-4 sm:h-4 transform group-hover:translate-x-1 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
+        {loading ? (
+          <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-full px-4 sm:px-0">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md animate-pulse"
+              >
+                <div className="aspect-square bg-gray-200"></div>
+                <div className="p-3 sm:p-4">
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                 </div>
-              )}
-            </Fragment>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-center mt-8 sm:mt-12 px-4 sm:px-0">
-          <Link href={"/product"}>
-            <Button className="px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-medium hover:scale-105 transform transition-transform duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
-              <span className="flex items-center gap-2">
-                View All Products
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </span>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">
+              <svg
+                className="w-16 h-16 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h3 className="text-xl font-semibold mb-2">
+                Failed to Load Products
+              </h3>
+              <p className="text-gray-600">{error}</p>
+            </div>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="secondary"
+            >
+              Retry
             </Button>
-          </Link>
-        </div>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg
+                className="w-16 h-16 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              <h3 className="text-xl font-semibold mb-2">No Products Found</h3>
+              <p className="text-gray-600">
+                No medical equipment available at the moment.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-full px-4 sm:px-0">
+            {data.map((item, i) => (
+              <Fragment key={i}>
+                {i <= 3 && (
+                  <div className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="relative">
+                      {item.image_url && (
+                        <div className="relative aspect-square overflow-hidden">
+                          <Image
+                            alt={item.name}
+                            width={400}
+                            src={item.image_url}
+                            height={400}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            quality={90}
+                            priority={i <= 3} // Load first 4 images immediately
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-3 sm:p-4">
+                      {item.category?.name && (
+                        <p className="text-xs sm:text-sm text-secondary-main font-medium mb-1 sm:mb-2">
+                          {item?.category?.name}
+                        </p>
+                      )}
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2 mb-2 sm:mb-3 group-hover:text-primary-main transition-colors">
+                        {item.name}
+                      </h3>
+                      <Link
+                        href={`/product/${item.id}`}
+                        className="inline-flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-primary-main font-medium hover:text-secondary-main transition-colors"
+                      >
+                        View Details
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 transform group-hover:translate-x-1 transition-transform"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                          />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+            ))}
+          </div>
+        )}{" "}
+        {!loading && !error && data.length > 0 && (
+          <div className="flex justify-center mt-8 sm:mt-12">
+            <Link href={"/product"}>
+              <Button className="px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-medium hover:scale-105 transform transition-transform duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto">
+                <span className="flex items-center gap-2">
+                  View All Products
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </span>
+              </Button>
+            </Link>
+          </div>
+        )}
       </PageContainer>
     </div>
   );
