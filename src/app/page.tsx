@@ -4,7 +4,7 @@ import Button from "@/components/Button";
 import DownloadCatalogButton from "@/components/DownloadCatalogButton";
 import FooterComponent from "@/components/FooterComponent";
 import ProductSection from "@/components/ProductSection";
-import ParallaxScrollScrubVideo from "@/components/ScroolVideo";
+import ProductImageViewer from "@/components/ProductImageViewer";
 import TopBar from "@/components/TopBar";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,6 +15,46 @@ export default function Home() {
     "Menampilkan detail produk interaktif",
     "Kepercayaan di utamakan",
     "Dm Medical Alkes",
+  ];
+
+  // Image filenames from public/gambar 360/
+  const imageViewerFiles = [
+    "1749361418673.png",
+    "1749361442438.png",
+    "1749361480852.png",
+    "1749361509490.png",
+    "1749361541080.png",
+    "1749361568275.png",
+    "1749361607039.png",
+    "1749361629981.png",
+    "1749361653444.png",
+    "1749361680988.png",
+    "1749361697863.png",
+    "1749361820233.png",
+    "1749361880002.png",
+    "1749361919231.png",
+    "1749361955718.png",
+    "1749362024215.png",
+    "1749362103003.png",
+    "1749362167861.png",
+    "1749362264065.png",
+    "1749362345575.png",
+    "1749362519986.png",
+    "1749362553428.png",
+    "1749362592254.png",
+    "1749362639031.png",
+    "1749362737481.png",
+    "1749362768893.png",
+    "1749362844664.png",
+    "1749362872413.png",
+    "1749362945107.png",
+    "1749362989601.png",
+    "1749363229233.png",
+    "1749363282954.png",
+    "1749363425960.png",
+    "1749363487075.png",
+    "1749363594156.png",
+    "1749363616077.png",
   ];
 
   return (
@@ -69,7 +109,8 @@ export default function Home() {
 
               {/* Video container */}
               <div className="relative z-10">
-                <ParallaxScrollScrubVideo value="/video.mp4" />
+                {/* <ParallaxScrollScrubVideo value="/video.mp4" /> */}
+                <ProductImageViewer imageFilenames={imageViewerFiles} />
               </div>
             </div>
           </div>
