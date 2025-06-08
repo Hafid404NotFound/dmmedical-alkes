@@ -28,6 +28,27 @@ const config: Config = {
           light: "var(--secondary-light)",
         },
       },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+        "spin-reverse": "spin-reverse 2s linear infinite",
+        float: "float 3s ease-in-out infinite",
+        glow: "glow 2s ease-in-out infinite alternate",
+        "bounce-slow": "bounce 2s infinite",
+      },
+      keyframes: {
+        "spin-reverse": {
+          from: { transform: "rotate(360deg)" },
+          to: { transform: "rotate(0deg)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        glow: {
+          "0%": { boxShadow: "0 0 5px rgba(255,255,255,0.3)" },
+          "100%": { boxShadow: "0 0 20px rgba(255,255,255,0.8)" },
+        },
+      },
     },
   },
   plugins: [],
