@@ -16,45 +16,44 @@ export default function Home() {
     "Kepercayaan di utamakan",
     "Dm Medical Alkes",
   ];
-
   // Image filenames from public/gambar 360/
   const imageViewerFiles = [
-    "1749361418673.png",
-    "1749361442438.png",
-    "1749361480852.png",
-    "1749361509490.png",
-    "1749361541080.png",
-    "1749361568275.png",
-    "1749361607039.png",
-    "1749361629981.png",
-    "1749361653444.png",
-    "1749361680988.png",
-    "1749361697863.png",
-    "1749361820233.png",
-    "1749361880002.png",
-    "1749361919231.png",
-    "1749361955718.png",
-    "1749362024215.png",
-    "1749362103003.png",
-    "1749362167861.png",
-    "1749362264065.png",
-    "1749362345575.png",
-    "1749362519986.png",
-    "1749362553428.png",
-    "1749362592254.png",
-    "1749362639031.png",
-    "1749362737481.png",
-    "1749362768893.png",
-    "1749362844664.png",
-    "1749362872413.png",
-    "1749362945107.png",
-    "1749362989601.png",
-    "1749363229233.png",
-    "1749363282954.png",
-    "1749363425960.png",
-    "1749363487075.png",
-    "1749363594156.png",
-    "1749363616077.png",
+    "1.png",
+    "2.png",
+    "3.png",
+    "4.png",
+    "5.png",
+    "6.png",
+    "7.png",
+    "8.png",
+    "9.png",
+    "10.png",
+    "11.png",
+    "12.png",
+    "13.png",
+    "14.png",
+    "15.png",
+    "16.png",
+    "17.png",
+    "18.png",
+    "19.png",
+    "20.png",
+    "21.png",
+    "22.png",
+    "23.png",
+    "24.png",
+    "26.png",
+    "27.png",
+    "28.png",
+    "29.png",
+    "30.png",
+    "31.png",
+    "32.png",
+    "33.png",
+    "34.png",
+    "35.png",
+    "36.png",
+    "37.png",
   ];
 
   return (
@@ -106,7 +105,8 @@ export default function Home() {
               {" "}
               {/* Corner accents */}
               <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-white/10"></div>
-              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-white/10"></div>              {/* 360 Image Text Overlay - Left corner */}
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-white/10"></div>{" "}
+              {/* 360 Image Text Overlay - Left corner */}
               <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-20">
                 <div className="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
                   <div className="w-4 h-4 sm:w-6 sm:h-6 flex items-center justify-center">
