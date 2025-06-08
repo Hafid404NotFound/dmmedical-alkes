@@ -19,9 +19,13 @@ export default function InputText(props: IProps) {
     (errors?.[props.name] && touched?.[props.name] ? errors[props.name] : "");
 
   return (
-    <div className="grid gap-1">
+    <div className={twMerge("grid gap-1", props.containerClassName)}>
       {props.label && (
-        <LabelInputField label={props.label} required={props.required} />
+        <LabelInputField
+          label={props.label}
+          required={props.required}
+          className={props.labelClassName}
+        />
       )}
       <div className={twMerge("relative flex items-center bg-white")}>
         {props.startIcon && (
@@ -48,7 +52,8 @@ export default function InputText(props: IProps) {
             "focus:outline-primary-main focus:bg-primary-main/10 ",
             props.startIcon ? "pl-9" : "",
             props.endIcon ? "pr-9" : "",
-            errorMessage ? " outline-red-500 bg-red-100" : ""
+            errorMessage ? " outline-red-500 bg-red-100" : "",
+            props.inputClassName // Apply inputClassName
           )}
           id={props.id}
         />
@@ -89,4 +94,32 @@ interface IProps {
   onChange?: ChangeEventHandler<HTMLInputElement>;
   autoComplete?: string;
   dataTestId?: string;
+  labelClassName?: string; // Added prop
+  inputClassName?: string; // Added prop
+  containerClassName?: string; // Added prop
 }
+
+// Also need to update LabelInputField to accept and use className
+// Assuming LabelInputField.tsx is in the same directory or accessible via path
+// This change is for LabelInputField.tsx
+/*
+import { twMerge } from "tailwind-merge";
+
+interface LabelInputFieldProps {
+  label: string;
+  required?: boolean;
+  className?: string; // Added className prop
+}
+
+export default function LabelInputField({
+  label,
+  required,
+  className,
+}: LabelInputFieldProps) {
+  return (
+    <label htmlFor={label} className={twMerge("block font-medium text-sm text-gray-700", className)}>
+      {label} {required && <span className="text-red-600">*</span>}
+    </label>
+  );
+}
+*/

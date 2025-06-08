@@ -126,14 +126,17 @@ export default function newProductPage() {
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-md">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
-              <MdLocalHospital className="text-2xl text-white" />
+        <div className="space-y-3 sm:space-y-6">
+          <div className="flex items-center gap-2 sm:gap-4 bg-white p-2 sm:p-4 rounded-xl shadow-md">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
+              <MdLocalHospital className="text-lg sm:text-2xl text-white" />
             </div>
             <div>
-              <PageTitle title="Tambah Alat Kesehatan" />
-              <p className="text-gray-500 text-sm">
+              <PageTitle
+                title="Tambah Alat Kesehatan"
+                className="text-sm sm:text-xl"
+              />
+              <p className="text-gray-500 text-[9px] sm:text-sm">
                 Lengkapi informasi detail alat kesehatan untuk katalog
               </p>
             </div>
@@ -142,21 +145,21 @@ export default function newProductPage() {
           <FormikProvider value={formik}>
             <Card>
               <CardBody>
-                <div className="grid gap-6">
-                  <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-                    <div className="flex items-center gap-2 text-primary-main font-medium mb-2">
-                      <MdMedicalServices className="text-xl" />
+                <div className="grid gap-3 sm:gap-6">
+                  <div className="bg-blue-50/50 p-2 sm:p-4 rounded-lg border border-blue-100">
+                    <div className="flex items-center gap-1 sm:gap-2 text-primary-main font-medium text-xs sm:text-base mb-1 sm:mb-2">
+                      <MdMedicalServices className="text-base sm:text-xl" />
                       Media Alat Kesehatan
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-[10px] sm:text-sm text-gray-600">
                       Upload foto dan video alat kesehatan dengan pencahayaan
                       yang baik untuk menampilkan detail produk dengan jelas
                     </p>
                   </div>
 
-                  <div className="grid gap-5">
-                    <div className="p-4 border border-gray-100 rounded-lg bg-gray-50/50">
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <div className="grid gap-3 sm:gap-5">
+                    <div className="p-2 sm:p-4 border border-gray-100 rounded-lg bg-gray-50/50">
+                      <label className="text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2 block">
                         Video Produk
                       </label>
                       <VidioUplaoded
@@ -165,8 +168,8 @@ export default function newProductPage() {
                       />
                     </div>
 
-                    <div className="p-4 border border-gray-100 rounded-lg bg-gray-50/50">
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <div className="p-2 sm:p-4 border border-gray-100 rounded-lg bg-gray-50/50">
+                      <label className="text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2 block">
                         Foto Produk
                       </label>
                       <UploadBoxCropperArea
@@ -183,6 +186,9 @@ export default function newProductPage() {
                       id="name"
                       name="name"
                       required
+                      labelClassName="text-[10px] sm:text-sm"
+                      inputClassName="text-[10px] sm:text-sm p-1.5 sm:p-2.5 h-auto sm:h-field-height"
+                      containerClassName="gap-0.5 sm:gap-1"
                     />
 
                     <InputAutocompleteOptional
@@ -191,21 +197,27 @@ export default function newProductPage() {
                       label="Kategori Alat Kesehatan"
                       required
                       options={dataCategory || []}
+                      labelClassName="text-[10px] sm:text-sm"
+                      inputClassName="text-[10px] sm:text-sm p-1.5 sm:py-2 h-auto sm:h-field-height"
+                      containerClassName="gap-0.5 sm:gap-1"
                     />
 
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-700 font-medium mb-4">
-                        <MdInventory className="text-xl text-secondary-main" />
+                    <div className="bg-gray-50 p-2 sm:p-4 rounded-lg">
+                      <div className="flex items-center gap-1 sm:gap-2 text-gray-700 font-medium text-xs sm:text-base mb-2 sm:mb-4">
+                        <MdInventory className="text-base sm:text-xl text-secondary-main" />
                         Link Pembelian
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="grid gap-2 sm:gap-4 sm:grid-cols-2">
                         <InputText
                           label="WhatsApp"
                           placeholder="Link konsultasi & pemesanan via WhatsApp"
                           id="wa_link"
                           name="wa_link"
                           required
+                          labelClassName="text-[10px] sm:text-sm"
+                          inputClassName="text-[10px] sm:text-sm p-1.5 sm:p-2.5 h-auto sm:h-field-height"
+                          containerClassName="gap-0.5 sm:gap-1"
                         />
                         <InputText
                           label="Tokopedia"
@@ -213,6 +225,9 @@ export default function newProductPage() {
                           id="tokopedia_link"
                           name="tokopedia_link"
                           required
+                          labelClassName="text-[10px] sm:text-sm"
+                          inputClassName="text-[10px] sm:text-sm p-1.5 sm:p-2.5 h-auto sm:h-field-height"
+                          containerClassName="gap-0.5 sm:gap-1"
                         />
                         <InputText
                           label="Shopee"
@@ -220,6 +235,9 @@ export default function newProductPage() {
                           id="shopee_link"
                           name="shopee_link"
                           required
+                          labelClassName="text-[10px] sm:text-sm"
+                          inputClassName="text-[10px] sm:text-sm p-1.5 sm:p-2.5 h-auto sm:h-field-height"
+                          containerClassName="gap-0.5 sm:gap-1"
                         />
                         <InputText
                           label="Bukalapak"
@@ -227,16 +245,19 @@ export default function newProductPage() {
                           id="bukalapak_link"
                           name="bukalapak_link"
                           required
+                          labelClassName="text-[10px] sm:text-sm"
+                          inputClassName="text-[10px] sm:text-sm p-1.5 sm:p-2.5 h-auto sm:h-field-height"
+                          containerClassName="gap-0.5 sm:gap-1"
                         />
                       </div>
                     </div>
 
                     {editorLoaded && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 block">
+                      <div className="space-y-1 sm:space-y-2">
+                        <label className="text-[10px] sm:text-sm font-medium text-gray-700 block">
                           Spesifikasi & Detail Produk
                         </label>
-                        <div className="text-sm text-gray-500 mb-2">
+                        <div className="text-[10px] sm:text-sm text-gray-500 mb-1 sm:mb-2">
                           Jelaskan spesifikasi teknis, manfaat, dan cara
                           penggunaan alat kesehatan secara detail
                         </div>
@@ -254,7 +275,7 @@ export default function newProductPage() {
                     <Button
                       loading={loading}
                       onClick={() => formik.handleSubmit()}
-                      className="bg-primary-main hover:bg-primary-dark text-white font-medium py-3 mt-4"
+                      className="w-full bg-primary-main hover:bg-primary-dark text-white font-medium text-[10px] sm:text-sm p-1.5 sm:px-4 sm:py-2 mt-3 sm:mt-4"
                     >
                       Simpan Alat Kesehatan
                     </Button>

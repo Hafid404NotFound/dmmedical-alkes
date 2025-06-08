@@ -16,6 +16,8 @@ import {
   MdEdit,
   MdLocalHospital,
   MdMedicalServices,
+  MdVideocam,
+  MdDescription,
 } from "react-icons/md";
 
 export default async function DetailProductPage({ params }: any) {
@@ -33,73 +35,98 @@ export default async function DetailProductPage({ params }: any) {
     )
   `
     )
-    .eq("id", params?.id as any);
-  const getdata: IProduct[] = query?.data || [];
-  const data = getdata[0];
+    .eq("id", params?.id as any)
+    .single(); // Use .single() as we expect one product or null
+
+  const data: IProduct | null = query?.data;
+
+  if (!data) {
+    // Handle case where product is not found, e.g., redirect or show a not found message
+    // For now, returning a simple message within the layout
+    return (
+      <DashboardLayout>
+        <DashboardContainer>
+          <PageTitle title="Produk Tidak Ditemukan" />
+          <p>Produk yang Anda cari tidak dapat ditemukan.</p>
+          <Link href="/dashboard/product">
+            <Button className="mt-4">Kembali ke Katalog</Button>
+          </Link>
+        </DashboardContainer>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg">
-                <MdLocalHospital className="text-2xl text-white" />
+        <div className="space-y-4 sm:space-y-6">
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-xl shadow-md">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
+                <MdLocalHospital className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
                 <PageTitle title="Detail Alat Kesehatan" />
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 text-xs sm:text-sm">
                   Informasi lengkap spesifikasi alat kesehatan
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              {params?.id && <ButtonDeleteProduct id={params?.id} />}
-              <Link href={`/dashboard/product/${params?.id}/edit`}>
-                <Button className="bg-primary-main hover:bg-primary-dark flex items-center gap-2">
-                  <MdEdit />
-                  Edit Produk
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              {params?.id && <ButtonDeleteProduct id={params?.id} />}{" "}
+              {/* Removed className */}
+              <Link
+                href={`/dashboard/product/${params?.id}/edit`}
+                className="w-full sm:w-auto"
+              >
+                <Button className="bg-primary-main hover:bg-primary-dark flex items-center justify-center gap-1.5 sm:gap-2 w-full">
+                  <MdEdit className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm">Edit Produk</span>
                 </Button>
               </Link>
             </div>
           </div>
 
           <Card>
-            <CardBody>
-              <div className="space-y-8">
-                {/* Header Produk */}
-                <div className="flex gap-6">
-                  <div className="relative w-[180px] h-[180px] rounded-xl border-2 border-primary-main/20 overflow-hidden">
+            <CardBody className="p-4 sm:p-6">
+              <div className="space-y-6 sm:space-y-8">
+                {/* Product Header: Image, Name, Category, Links */}
+                <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+                  <div className="relative w-full md:w-[180px] lg:w-[200px] h-[180px] md:h-auto md:aspect-square rounded-xl border-2 border-primary-main/10 overflow-hidden flex-shrink-0 shadow-md">
                     <Image
                       src={data.image_url}
                       alt={data.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 180px, 200px"
                       style={{ objectFit: "cover" }}
                       className="hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 text-secondary-main mb-2">
-                      <MdMedicalServices />
-                      <span className="text-gray-600">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-secondary-main mb-1 sm:mb-2">
+                      <MdMedicalServices className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-gray-600 text-sm sm:text-base">
                         {data.category?.name || "Alat Kesehatan"}
                       </span>
                     </div>
-                    <h1 className="text-3xl font-semibold text-primary-main mb-6">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-primary-main mb-3 sm:mb-4 lg:mb-6">
                       {data.name}
                     </h1>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Marketplace Links */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                       {data.tokopedia_link && (
                         <Link target="_blank" href={data.tokopedia_link}>
-                          <div className="bg-[#4D9E0B] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-3 px-4 py-2">
+                          <div className="bg-[#4D9E0B] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
                             <Image
                               src="/1tokopedia.png"
                               alt="tokopedia"
-                              height={40}
-                              width={40}
-                              className="h-10 w-auto"
+                              height={28} // Adjusted size
+                              width={28} // Adjusted size
+                              className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
                             />
-                            <div className="text-white font-medium">
+                            <div className="text-white font-medium text-xs sm:text-sm">
                               Beli di Tokopedia
                             </div>
                           </div>
@@ -107,15 +134,15 @@ export default async function DetailProductPage({ params }: any) {
                       )}
                       {data.shopee_link && (
                         <Link target="_blank" href={data.shopee_link}>
-                          <div className="bg-[#DA9B3D] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-3 px-4 py-2">
+                          <div className="bg-[#DA9B3D] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
                             <Image
                               src="/shopee.png"
                               alt="shopee"
-                              height={40}
-                              width={40}
-                              className="h-10 w-auto"
+                              height={28}
+                              width={28}
+                              className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
                             />
-                            <div className="text-white font-medium">
+                            <div className="text-white font-medium text-xs sm:text-sm">
                               Beli di Shopee
                             </div>
                           </div>
@@ -123,15 +150,15 @@ export default async function DetailProductPage({ params }: any) {
                       )}
                       {data.bukalapak_link && (
                         <Link target="_blank" href={data.bukalapak_link}>
-                          <div className="bg-[#E31E52] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-3 px-4 py-2">
+                          <div className="bg-[#E31E52] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
                             <Image
                               src="/bukalapak.png"
                               alt="bukalapak"
-                              height={40}
-                              width={40}
-                              className="h-10 w-auto"
+                              height={28}
+                              width={28}
+                              className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
                             />
-                            <div className="text-white font-medium">
+                            <div className="text-white font-medium text-xs sm:text-sm">
                               Beli di Bukalapak
                             </div>
                           </div>
@@ -139,9 +166,9 @@ export default async function DetailProductPage({ params }: any) {
                       )}
                       {data.wa_link && (
                         <Link target="_blank" href={data.wa_link}>
-                          <div className="bg-[#25D366] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-3 px-4 py-2">
-                            <MdWhatsapp className="text-white text-3xl" />
-                            <div className="text-white font-medium">
+                          <div className="bg-[#25D366] rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
+                            <MdWhatsapp className="text-white w-6 h-6 sm:w-7 sm:h-7" />
+                            <div className="text-white font-medium text-xs sm:text-sm">
                               Konsultasi via WhatsApp
                             </div>
                           </div>
@@ -153,48 +180,24 @@ export default async function DetailProductPage({ params }: any) {
 
                 {/* Video Preview */}
                 {data.video_url && (
-                  <div className="bg-gray-50 p-4 rounded-xl">
-                    <div className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 text-secondary-main"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-xl shadow-sm">
+                    <div className="text-sm sm:text-base font-medium text-gray-700 mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
+                      <MdVideocam className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-main" />
                       Video Demonstrasi Produk
                     </div>
-                    <div className="relative z-[99] w-full aspect-video rounded-xl overflow-hidden shadow-lg">
+                    <div className="relative w-full aspect-video rounded-lg sm:rounded-xl overflow-hidden shadow-md">
                       <ParallaxScrollScrubVideo value={data.video_url} />
                     </div>
                   </div>
                 )}
 
                 {/* Deskripsi Produk */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-gray-700 font-medium">
-                    <svg
-                      className="w-5 h-5 text-secondary-main"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-gray-700 font-medium text-sm sm:text-base">
+                    <MdDescription className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-main" />
                     Spesifikasi & Detail Produk
                   </div>
-                  <div className="prose max-w-none">
+                  <div className="prose prose-sm sm:prose-base max-w-none p-2 sm:p-3 bg-gray-50 rounded-lg">
                     <CKEditorPreview content={data.description} />
                   </div>
                 </div>
