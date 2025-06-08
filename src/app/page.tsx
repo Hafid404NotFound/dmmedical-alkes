@@ -106,14 +106,13 @@ export default function Home() {
               {" "}
               {/* Corner accents */}
               <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-white/10"></div>
-              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-white/10"></div>
-              {/* 360 Image Text Overlay - Left corner */}
-              <div className="absolute top-4 left-4 z-20">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                  <div className="w-6 h-6 flex items-center justify-center">
+              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-white/10"></div>              {/* 360 Image Text Overlay - Left corner */}
+              <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-20">
+                <div className="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                  <div className="w-4 h-4 sm:w-6 sm:h-6 flex items-center justify-center">
                     <svg
                       viewBox="0 0 24 24"
-                      className="w-5 h-5 text-white/80"
+                      className="w-3 h-3 sm:w-5 sm:h-5 text-white/80"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -123,10 +122,10 @@ export default function Home() {
                       <path d="M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <span className="text-white/90 font-semibold text-sm tracking-wide">
+                  <span className="text-white/90 font-medium sm:font-semibold text-xs sm:text-sm tracking-wide">
                     360° IMAGE
                   </span>
-                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/60 rounded-full animate-pulse"></div>
                 </div>
               </div>
               {/* Video container */}
