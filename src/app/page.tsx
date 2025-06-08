@@ -102,24 +102,25 @@ export default function Home() {
 
           {/* Main content container */}
           <div className="w-full h-full flex items-center justify-center py-3 sm:py-4 lg:py-0">
-            <div className="w-[85%] sm:w-[88%] lg:w-[90%] mx-auto relative">              {/* Corner accents */}
+            <div className="w-[85%] sm:w-[88%] lg:w-[90%] mx-auto relative">
+              {" "}
+              {/* Corner accents */}
               <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-white/10"></div>
               <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-white/10"></div>
-
               {/* 360 Image Text Overlay - Left corner */}
               <div className="absolute top-4 left-4 z-20">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
                   <div className="w-6 h-6 flex items-center justify-center">
-                    <svg 
-                      viewBox="0 0 24 24" 
+                    <svg
+                      viewBox="0 0 24 24"
                       className="w-5 h-5 text-white/80"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
                     >
-                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                      <path d="M2 17l10 5 10-5"/>
-                      <path d="M2 12l10 5 10-5"/>
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
                     </svg>
                   </div>
                   <span className="text-white/90 font-semibold text-sm tracking-wide">
@@ -128,7 +129,6 @@ export default function Home() {
                   <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
                 </div>
               </div>
-
               {/* Video container */}
               <div className="relative z-10">
                 {/* <ParallaxScrollScrubVideo value="/video.mp4" /> */}

@@ -193,7 +193,8 @@ export default function ProductImageViewer({
           priority={true}
           draggable={false}
         />
-      )}{" "}      {/* 360 Icon */}
+      )}{" "}
+      {/* 360 Icon */}
       {imagePaths.length > 1 && (
         <div className="absolute bottom-4 right-4 z-10 p-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
           <svg
