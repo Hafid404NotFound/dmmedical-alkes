@@ -193,10 +193,9 @@ export default function ProductImageViewer({
           priority={true}
           draggable={false}
         />
-      )}{" "}
-      {/* 360 Icon */}
+      )}{" "}      {/* 360 Icon */}
       {imagePaths.length > 1 && (
-        <div className="absolute bottom-4 right-4 z-10 p-2 bg-primary-main rounded-full border-2 border-primary-main backdrop-blur-sm">
+        <div className="absolute bottom-4 right-4 z-10 p-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
           <svg
             width="24"
             height="24"
@@ -204,7 +203,7 @@ export default function ProductImageViewer({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             style={{ transform: `rotate(${rotationAngle}deg)` }}
-            className="text-white transition-transform duration-200 ease-linear"
+            className="text-white/80 transition-transform duration-200 ease-linear"
           >
             {" "}
             {/* Main rotating arrow circle */}
