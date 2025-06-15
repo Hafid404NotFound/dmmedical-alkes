@@ -33,7 +33,7 @@ export default function ActionButtonWa() {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       const message = `Halo, Saya ingin bertanya seputar produk Dm Medical. Nama = ${values.name}, Email = ${values.email}, Perusahaan = ${values.hospital}`;
-      const url = `https://api.whatsapp.com/send?phone=62895366450806&text=${encodeURIComponent(
+      const url = `https://api.whatsapp.com/send?phone=6281389037818&text=${encodeURIComponent(
         message
       )}`;
       window.open(url, "_blank", "noopener,noreferrer");
