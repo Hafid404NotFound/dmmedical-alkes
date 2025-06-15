@@ -103,15 +103,15 @@ export default function GetQuestionPage() {
                     </div>
                     <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
                       <MdPhone className="text-xl text-primary-main" />
-                      <p>+62-21-78838951</p>
+                      <p>+62 81389037818</p>
                     </div>
                     <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
                       <IoLogoWhatsapp className="text-xl text-primary-main" />
-                      <p>+62-812-8877-0321</p>
+                      <p>+62 81389037818</p>
                     </div>
                     <div className="flex items-center gap-3 group hover:text-primary-main transition-colors duration-300">
                       <MdMail className="text-xl text-primary-main" />
-                      <p>marketing@kp3.co.id</p>
+                      <p>marketing@dm.co.id</p>
                     </div>
                   </div>
                 </div>

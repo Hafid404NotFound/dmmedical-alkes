@@ -72,7 +72,11 @@ export default async function DetailProductPage({ params }: any) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {data.tokopedia_link && (
-                <Link target="_blank" href={data.tokopedia_link} className="block">
+                <Link
+                  target="_blank"
+                  href={data.tokopedia_link}
+                  className="block"
+                >
                   <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
                     <div className="w-8 sm:w-10 flex-shrink-0">
                       <Image
@@ -162,6 +166,14 @@ export default async function DetailProductPage({ params }: any) {
                     <MdWhatsapp className="text-green-500 text-lg sm:text-xl flex-shrink-0" />
                     <p className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300 text-sm sm:text-base">
                       0895366450806 (Bekasi)
+                    </p>
+                  </div>
+                </CardBody>
+                <CardBody className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 group">
+                    <MdWhatsapp className="text-green-500 text-lg sm:text-xl flex-shrink-0" />
+                    <p className="text-gray-600 group-hover:text-gray-800 transition-colors duration-300 text-sm sm:text-base">
+                      081389037818 (Jakarta Selatan)
                     </p>
                   </div>
                 </CardBody>

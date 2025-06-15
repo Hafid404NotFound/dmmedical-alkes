@@ -11,28 +11,28 @@ export const dataContact = [
     icon: <MdPinDrop />,
   },
   {
-    label: "+62-21-78838951",
+    label: "+62 813-8903-7818",
     icon: <MdPhone />,
   },
   {
-    label: "marketing@Dm.co.id",
+    label: "marketing@dm.co.id",
     icon: <MdMail />,
   },
 ];
 
 const dataSosmed = [
-  {
-    url: "https://google.com",
-    icon: MdFacebook,
-  },
+  // {
+  //   url: "https://google.com",
+  //   icon: MdFacebook,
+  // },
   {
     url: "https://www.instagram.com/dmmedical_alkes/",
     icon: IoLogoInstagram,
   },
-  {
-    url: "https://google.com",
-    icon: PiLinkedinLogo,
-  },
+  // {
+  //   url: "https://google.com",
+  //   icon: PiLinkedinLogo,
+  // },
 ];
 
 export default function FooterComponent() {
