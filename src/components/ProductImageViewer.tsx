@@ -13,43 +13,51 @@ export default function ProductImageViewer({
   basePath = "/gambar 360/",
 }: ProductImageViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Refs for interaction state (unified for mouse and touch)
   const interactionStartXRef = useRef<number | null>(null);
   const imageIndexAtInteractionStartRef = useRef<number>(0);
   const isInteractingRef = useRef<boolean>(false);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
 
-  const sensitivity = 20; // Lower value = more sensitive
+  const sensitivity = 15; // Adjusted for smoother movement
 
   const imagePaths = useMemo(() => {
     if (!imageFilenames) return [];
     return imageFilenames.map((name) => `${basePath}${name}`);
   }, [imageFilenames, basePath]);
-
   useEffect(() => {
     if (imagePaths && imagePaths.length > 0) {
-      const imagesToPreload = Math.min(imagePaths.length, 5);
+      setIsLoading(true);
+      // Preload all images for smoother experience
+      const imagesToPreload = imagePaths.length;
       let loadedCount = 0;
+
       if (imagesToPreload === 0) {
         setCurrentIndex(0);
+        setIsLoading(false);
         return;
       }
-      for (let i = 0; i < imagesToPreload; i++) {
+
+      // Preload images
+      imagePaths.forEach((imagePath, index) => {
         const img = new window.Image();
-        img.src = imagePaths[i];
+        img.src = imagePath;
         const onFinishLoad = () => {
           loadedCount++;
           if (loadedCount === imagesToPreload) {
             setCurrentIndex(0);
+            setIsLoading(false);
           }
         };
         img.onload = onFinishLoad;
         img.onerror = () => {
-          console.error("Error preloading image:", imagePaths[i]);
+          console.error("Error preloading image:", imagePath);
           onFinishLoad();
         };
-      }
+      });
     }
   }, [imagePaths]);
 
@@ -63,7 +71,6 @@ export default function ProductImageViewer({
     imageIndexAtInteractionStartRef.current = currentIndex;
     document.body.style.userSelect = "none";
   };
-
   // --- Unified Interaction Move ---
   const handleInteractionMove = (clientX: number) => {
     if (
@@ -72,6 +79,11 @@ export default function ProductImageViewer({
       imagePaths.length === 0
     )
       return;
+
+    // Throttle updates for smoother performance
+    const now = Date.now();
+    if (now - lastUpdateTimeRef.current < 16) return; // ~60fps
+    lastUpdateTimeRef.current = now;
 
     const dx = clientX - interactionStartXRef.current;
     const imageChange = Math.round(dx / sensitivity);
@@ -84,8 +96,7 @@ export default function ProductImageViewer({
 
       if (newIndex !== currentIndex) {
         setCurrentIndex(newIndex);
-        interactionStartXRef.current = clientX;
-        imageIndexAtInteractionStartRef.current = newIndex;
+        // Don't reset the interaction start position to maintain continuous movement
       }
     }
   };
@@ -155,11 +166,18 @@ export default function ProductImageViewer({
       document.body.style.userSelect = "";
     };
   }, []);
-
   if (!imagePaths || imagePaths.length === 0) {
     return (
-      <div className="w-full aspect-[16/9] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <p className="text-gray-500 dark:text-gray-400">No images available.</p>
+      <div className="w-full aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
+        <p className="text-gray-500">No images available.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="w-full aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-main"></div>
       </div>
     );
   }
@@ -182,17 +200,22 @@ export default function ProductImageViewer({
       onTouchEnd={handleTouchEndOrCancel}
       onTouchCancel={handleTouchEndOrCancel}
     >
+      {" "}
       {currentImageSrc && (
-        <Image
-          key={currentImageSrc}
-          src={currentImageSrc}
-          alt={`View 360 - Image ${currentIndex + 1}`}
-          layout="fill"
-          objectFit="contain" // Changed from "cover" to "contain"
-          className="transition-opacity duration-100 ease-in-out pointer-events-none"
-          priority={true}
-          draggable={false}
-        />
+        <div className="relative w-full h-full">
+          <Image
+            key={`360-image-${currentIndex}`}
+            src={currentImageSrc}
+            alt={`View 360 - Image ${currentIndex + 1}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: "contain" }}
+            className="pointer-events-none select-none"
+            priority={currentIndex < 5}
+            draggable={false}
+            unoptimized={false}
+          />
+        </div>
       )}{" "}
       {/* 360 Icon */}
       {imagePaths.length > 1 && (
@@ -204,7 +227,7 @@ export default function ProductImageViewer({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             style={{ transform: `rotate(${rotationAngle}deg)` }}
-            className="text-white/80 transition-transform duration-200 ease-linear"
+            className="text-white/80 transition-transform duration-100 ease-linear will-change-transform"
           >
             {" "}
             {/* Main rotating arrow circle */}
