@@ -21,18 +21,18 @@ export const dataContact = [
 ];
 
 const dataSosmed = [
-  // {
-  //   url: "https://google.com",
-  //   icon: MdFacebook,
-  // },
+  {
+    url: "https://google.com",
+    icon: MdFacebook,
+  },
   {
     url: "https://www.instagram.com/dmmedical_alkes/",
     icon: IoLogoInstagram,
   },
-  // {
-  //   url: "https://google.com",
-  //   icon: PiLinkedinLogo,
-  // },
+  {
+    url: "https://google.com",
+    icon: PiLinkedinLogo,
+  },
 ];
 
 export default function FooterComponent() {
