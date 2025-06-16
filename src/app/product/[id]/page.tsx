@@ -60,11 +60,10 @@ export default async function DetailProductPage({ params }: any) {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <ActionButtonWa />
-      <TopBar />
-
+      <TopBar />{" "}
       <PageContainer>
         {" "}
-        <div className="lg:grid lg:grid-cols-2 gap-12 mt-20">
+        <div className="lg:grid lg:grid-cols-2 gap-12 mt-6 sm:mt-8 lg:mt-12">
           {/* Enhanced Media Section - Video 360° and Gallery */}
           <div className="w-full space-y-6">
             {data ? (
@@ -86,30 +85,31 @@ export default async function DetailProductPage({ params }: any) {
             )}
           </div>
           {/* Content Section */}
-          <div className="flex-1 lg:pl-4 space-y-8">
+          <div className="flex-1 lg:pl-4 space-y-6 sm:space-y-8 mt-6 lg:mt-0">
             {" "}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {data.category && (
-                <div className="text-primary-main/80 font-medium">
+                <div className="text-primary-main/80 font-medium text-sm sm:text-base">
                   {data.category.name}
                 </div>
               )}
-              <h1 className="text-4xl font-semibold text-gray-800 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 leading-tight">
                 {data.name}
               </h1>
-            </div>
+            </div>{" "}
             <div className="prose prose-gray max-w-none">
               <CKEditorPreview content={data.description} />
             </div>{" "}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               {data.tokopedia_link && (
                 <Link
                   target="_blank"
                   href={data.tokopedia_link}
                   className="block"
                 >
-                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <div className="w-10 flex-shrink-0">
+                  {" "}
+                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-8 sm:w-10 flex-shrink-0">
                       <Image
                         src="/1tokopedia.png"
                         alt="tokopedia"
@@ -118,7 +118,7 @@ export default async function DetailProductPage({ params }: any) {
                         className="w-full h-auto"
                       />
                     </div>
-                    <div className="text-white font-medium">
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via Tokopedia
                     </div>
                   </div>
@@ -127,8 +127,9 @@ export default async function DetailProductPage({ params }: any) {
 
               {data.shopee_link && (
                 <Link target="_blank" href={data.shopee_link} className="block">
-                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <div className="w-10 flex-shrink-0">
+                  {" "}
+                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-8 sm:w-10 flex-shrink-0">
                       <Image
                         src="/shopee.png"
                         alt="shopee"
@@ -137,7 +138,7 @@ export default async function DetailProductPage({ params }: any) {
                         className="w-full h-auto"
                       />
                     </div>
-                    <div className="text-white font-medium">
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via Shopee
                     </div>
                   </div>
@@ -146,9 +147,10 @@ export default async function DetailProductPage({ params }: any) {
 
               {data.wa_link && (
                 <Link target="_blank" href={data.wa_link} className="block">
-                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <MdWhatsapp className="text-white text-3xl flex-shrink-0" />
-                    <div className="text-white font-medium">
+                  {" "}
+                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <MdWhatsapp className="text-white text-2xl sm:text-3xl flex-shrink-0" />
+                    <div className="text-white font-medium text-sm sm:text-base">
                       Beli via WhatsApp
                     </div>
                   </div>
@@ -210,10 +212,9 @@ export default async function DetailProductPage({ params }: any) {
               </Card>
             </div>
           </div>
-        </div>
+        </div>{" "}
       </PageContainer>
-
-      <div className="h-32"></div>
+      <div className="h-16 sm:h-24 lg:h-32"></div>
       <FooterComponent />
     </div>
   );
