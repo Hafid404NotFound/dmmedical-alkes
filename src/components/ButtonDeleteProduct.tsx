@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import Button from "./Button";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { showToast } from "@/utils/toast-helper";
 import { useState } from "react";
 import PopupModal from "./PopupModal";
 import { Card, CardBody } from "./Card";
@@ -16,11 +16,10 @@ export function ButtonDeleteProduct(props: IProps) {
       .from("product")
       .delete()
       .eq("id", props.id);
-
     if (error) {
       console.error("Error deleting:", error.message);
     } else {
-      toast.success("Deleted successfully");
+      showToast.success("Deleted successfully");
       router.push("/dashboard/product");
     }
   }

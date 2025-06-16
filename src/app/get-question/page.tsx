@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { MdMail, MdPhone, MdPinDrop } from "react-icons/md";
 import { IoLogoWhatsapp } from "react-icons/io";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import * as yup from "yup";
 
 export default function GetQuestionPage() {
@@ -61,10 +61,9 @@ export default function GetQuestionPage() {
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-light/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary-light/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary-light/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>{" "}
       </div>
 
-      <Toaster position="bottom-center" />
       <TopBar transparent />
 
       <div className="relative pb-10 lg:mt-0 mt-12">

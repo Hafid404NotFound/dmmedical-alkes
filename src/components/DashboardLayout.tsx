@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import SidebarDashboard from "./SidebarDashboard";
-import { Toaster } from "react-hot-toast";
 
 export default function DashboardLayout(props: IProps) {
   return (
@@ -25,12 +24,10 @@ export default function DashboardLayout(props: IProps) {
             +
           </div>
         </div>
-      </div>
-
+      </div>{" "}
       {/* Main Layout */}
       <div className="relative grid lg:flex min-h-screen">
         <SidebarDashboard />
-        <Toaster position="top-center" />
 
         <div className="flex-1 p-6 lg:p-8">
           <div className="backdrop-blur-sm bg-white/80 rounded-2xl shadow-lg p-6 min-h-[calc(100vh-4rem)]">
