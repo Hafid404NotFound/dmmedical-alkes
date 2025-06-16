@@ -6,7 +6,6 @@ import CKEditorPreview from "@/components/CkEditorPreview";
 import DashboardContainer from "@/components/DashboardContainer";
 import DashboardLayout from "@/components/DashboardLayout";
 import PageTitle from "@/components/PageTitle";
-import ParallaxScrollScrubVideo from "@/components/ScroolVideo";
 import { IProduct } from "@/types/IProduct";
 import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
@@ -16,7 +15,6 @@ import {
   MdEdit,
   MdLocalHospital,
   MdMedicalServices,
-  MdVideocam,
   MdDescription,
 } from "react-icons/md";
 
@@ -176,21 +174,7 @@ export default async function DetailProductPage({ params }: any) {
                       )}
                     </div>
                   </div>
-                </div>
-
-                {/* Video Preview */}
-                {data.video_url && (
-                  <div className="bg-gray-50 p-3 sm:p-4 rounded-xl shadow-sm">
-                    <div className="text-sm sm:text-base font-medium text-gray-700 mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
-                      <MdVideocam className="w-4 h-4 sm:w-5 sm:h-5 text-secondary-main" />
-                      Video Demonstrasi Produk
-                    </div>
-                    <div className="relative w-full aspect-video rounded-lg sm:rounded-xl overflow-hidden shadow-md">
-                      <ParallaxScrollScrubVideo value={data.video_url} />
-                    </div>
-                  </div>
-                )}
-
+                </div>{" "}
                 {/* Deskripsi Produk */}
                 <div className="space-y-2 sm:space-y-3">
                   <div className="flex items-center gap-1.5 sm:gap-2 text-gray-700 font-medium text-sm sm:text-base">

@@ -168,7 +168,7 @@ export default function ProductImageViewer({
   }, []);
   if (!imagePaths || imagePaths.length === 0) {
     return (
-      <div className="w-full aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
+      <div className="w-full aspect-[16/9] sm:aspect-[4/3] lg:aspect-[3/2] xl:aspect-[16/10] 2xl:aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
         <p className="text-gray-500">No images available.</p>
       </div>
     );
@@ -176,7 +176,7 @@ export default function ProductImageViewer({
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
+      <div className="w-full aspect-[16/9] sm:aspect-[4/3] lg:aspect-[3/2] xl:aspect-[16/10] 2xl:aspect-[16/9] flex items-center justify-center bg-gray-100 rounded-lg">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-main"></div>
       </div>
     );
@@ -185,11 +185,10 @@ export default function ProductImageViewer({
   const currentImageSrc = imagePaths[currentIndex];
   const rotationAngle =
     imagePaths.length > 0 ? (currentIndex / imagePaths.length) * 360 : 0;
-
   return (
     <div
       ref={viewerRef}
-      className="relative w-full aspect-[16/9] overflow-hidden rounded-lg shadow-lg group select-none touch-pan-y"
+      className="relative w-full aspect-[16/9] sm:aspect-[4/3] lg:aspect-[3/2] xl:aspect-[16/10] 2xl:aspect-[16/9] overflow-hidden rounded-lg shadow-lg group select-none touch-pan-y"
       style={{ cursor: "grab" }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

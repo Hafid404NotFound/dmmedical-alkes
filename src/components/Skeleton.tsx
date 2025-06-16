@@ -4,15 +4,15 @@ function Skeleton(props: IProps) {
   return (
     <div
       className={twMerge(
-        "h-2.5 animate-pulse bg-gray-200 rounded-full  w-full ",
+        "bg-slate-200 animate-pulse rounded-lg",
         props.className
       )}
     ></div>
   );
 }
 
-export default Skeleton;
-
 interface IProps {
   className?: string;
 }
+
+export default Skeleton;

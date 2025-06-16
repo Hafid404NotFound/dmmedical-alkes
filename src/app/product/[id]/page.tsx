@@ -4,7 +4,7 @@ import CKEditorPreview from "@/components/CkEditorPreview";
 import Divider from "@/components/Divider";
 import FooterComponent from "@/components/FooterComponent";
 import PageContainer from "@/components/PageContainer";
-import ParallaxScrollScrubVideo from "@/components/ScroolVideo";
+import ProductMediaViewer from "@/components/ProductMediaViewer";
 import TopBar from "@/components/TopBar";
 import { IProduct } from "@/types/IProduct";
 import { createClient } from "@/utils/supabase/server";
@@ -21,64 +21,95 @@ export default async function DetailProductPage({ params }: any) {
     .eq("id", id);
   const data: IProduct = query?.data ? query?.data[0] : undefined;
 
+  // Parse gallery_images dengan error handling yang robust
+  if (data && data.gallery_images) {
+    if (typeof data.gallery_images === "string") {
+      try {
+        data.gallery_images = JSON.parse(data.gallery_images);
+      } catch (error) {
+        console.error("Error parsing gallery_images:", error);
+        data.gallery_images = [];
+      }
+    }
+    // Ensure it's always an array
+    if (!Array.isArray(data.gallery_images)) {
+      data.gallery_images = [];
+    }
+  } else if (data) {
+    data.gallery_images = [];
+  }
+
+  // Parse images360 dengan error handling yang robust
+  if (data && data.images360) {
+    if (typeof data.images360 === "string") {
+      try {
+        data.images360 = JSON.parse(data.images360);
+      } catch (error) {
+        console.error("Error parsing images360:", error);
+        data.images360 = [];
+      }
+    }
+    // Ensure it's always an array
+    if (!Array.isArray(data.images360)) {
+      data.images360 = [];
+    }
+  } else if (data) {
+    data.images360 = [];
+  }
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       <ActionButtonWa />
       <TopBar />
 
       <PageContainer>
-        <div className="lg:grid lg:grid-cols-2 gap-4 sm:gap-8 lg:gap-12 mt-12 sm:mt-16 lg:mt-20">
-          {/* Media Section - Video or Image */}
-          <div className="w-full space-y-4 sm:space-y-6">
-            {data.video_url ? (
-              <div className="relative w-full overflow-hidden bg-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="aspect-video">
-                  <ParallaxScrollScrubVideo value={data.video_url} />
+        {" "}
+        <div className="lg:grid lg:grid-cols-2 gap-12 mt-20">
+          {/* Enhanced Media Section - Video 360° and Gallery */}
+          <div className="w-full space-y-6">
+            {data ? (
+              <ProductMediaViewer
+                images360={Array.isArray(data.images360) ? data.images360 : []}
+                mainImageUrl={data.image_url}
+                galleryImages={
+                  Array.isArray(data.gallery_images) ? data.gallery_images : []
+                }
+                productName={data.name}
+              />
+            ) : (
+              <div className="w-full aspect-video bg-gray-100 rounded-2xl flex items-center justify-center">
+                <div className="text-center text-gray-500">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 animate-pulse"></div>
+                  <p>Loading product media...</p>
                 </div>
               </div>
-            ) : data.image_url ? (
-              <div className="relative w-full overflow-hidden bg-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="aspect-video">
-                  <Image
-                    src={data.image_url}
-                    alt={data.name || "Product image"}
-                    width={1280}
-                    height={720}
-                    className="w-full h-full object-contain"
-                    priority
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                  />
-                </div>
-              </div>
-            ) : null}
+            )}
           </div>
-
           {/* Content Section */}
-          <div className="flex-1 lg:pl-4 mt-8 lg:mt-0 space-y-6 sm:space-y-8">
-            <div className="space-y-3 sm:space-y-4">
+          <div className="flex-1 lg:pl-4 space-y-8">
+            {" "}
+            <div className="space-y-4">
               {data.category && (
-                <div className="text-primary-main/80 font-medium text-sm sm:text-base">
+                <div className="text-primary-main/80 font-medium">
                   {data.category.name}
                 </div>
               )}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 leading-tight">
+              <h1 className="text-4xl font-semibold text-gray-800 leading-tight">
                 {data.name}
               </h1>
             </div>
-
             <div className="prose prose-gray max-w-none">
               <CKEditorPreview content={data.description} />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            </div>{" "}
+            <div className="grid grid-cols-1 gap-4">
               {data.tokopedia_link && (
                 <Link
                   target="_blank"
                   href={data.tokopedia_link}
                   className="block"
                 >
-                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <div className="w-8 sm:w-10 flex-shrink-0">
+                  <div className="bg-[#4D9E0B] hover:bg-[#458d0a] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-10 flex-shrink-0">
                       <Image
                         src="/1tokopedia.png"
                         alt="tokopedia"
@@ -87,7 +118,7 @@ export default async function DetailProductPage({ params }: any) {
                         className="w-full h-auto"
                       />
                     </div>
-                    <div className="text-white font-medium text-sm sm:text-base">
+                    <div className="text-white font-medium">
                       Beli via Tokopedia
                     </div>
                   </div>
@@ -96,8 +127,8 @@ export default async function DetailProductPage({ params }: any) {
 
               {data.shopee_link && (
                 <Link target="_blank" href={data.shopee_link} className="block">
-                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <div className="w-8 sm:w-10 flex-shrink-0">
+                  <div className="bg-[#DA9B3D] hover:bg-[#c58935] flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <div className="w-10 flex-shrink-0">
                       <Image
                         src="/shopee.png"
                         alt="shopee"
@@ -106,7 +137,7 @@ export default async function DetailProductPage({ params }: any) {
                         className="w-full h-auto"
                       />
                     </div>
-                    <div className="text-white font-medium text-sm sm:text-base">
+                    <div className="text-white font-medium">
                       Beli via Shopee
                     </div>
                   </div>
@@ -115,16 +146,15 @@ export default async function DetailProductPage({ params }: any) {
 
               {data.wa_link && (
                 <Link target="_blank" href={data.wa_link} className="block">
-                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                    <MdWhatsapp className="text-white text-2xl sm:text-3xl flex-shrink-0" />
-                    <div className="text-white font-medium text-sm sm:text-base">
+                  <div className="bg-green-600 hover:bg-green-700 flex items-center gap-4 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                    <MdWhatsapp className="text-white text-3xl flex-shrink-0" />
+                    <div className="text-white font-medium">
                       Beli via WhatsApp
                     </div>
                   </div>
                 </Link>
               )}
             </div>
-
             {/* Cards Section */}
             <div className="space-y-4 sm:space-y-6">
               <Card className="hover:shadow-lg transition-all duration-300">

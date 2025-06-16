@@ -139,7 +139,9 @@ export default function newProductPage() {
         setLoading(false);
         toast.error("Gagal membuat kategori");
         return;
-      } // Prepare data for database
+      }
+
+      // Prepare data for database
       const productData: any = {
         name: e.name?.trim() || "",
         description: e.description?.trim() || "",
@@ -311,6 +313,7 @@ export default function newProductPage() {
       toast.error(`Terjadi kesalahan: ${error.message || "Unknown error"}`);
     }
   };
+
   const initValue: IReqCreateNewProduct = {
     description: "",
     image_url: "",
@@ -336,15 +339,14 @@ export default function newProductPage() {
   return (
     <DashboardLayout>
       <DashboardContainer>
-        {" "}
-        <div className="space-y-4 sm:space-y-6 px-3 sm:px-0 max-w-4xl mx-auto">
+        <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
           {/* Migration Helper - only show in development */}
           {process.env.NODE_ENV === "development" && <MigrationHelper />}
 
           {/* Header */}
-          <div className="flex items-center gap-3 sm:gap-4 bg-white p-4 sm:p-4 rounded-xl shadow-sm border border-gray-100">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
-              <MdLocalHospital className="text-xl text-white" />
+          <div className="flex items-center gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
+              <MdLocalHospital className="text-lg sm:text-2xl text-white" />
             </div>
             <div>
               <PageTitle
@@ -359,9 +361,8 @@ export default function newProductPage() {
 
           <FormikProvider value={formik}>
             <Card>
-              {" "}
               <CardBody className="p-4 sm:p-6">
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-6 sm:space-y-8">
                   {/* Media Section Header */}
                   <div className="bg-blue-50/70 p-4 rounded-lg border border-blue-100">
                     <div className="flex items-center gap-2 text-primary-main font-medium text-base mb-2">
@@ -370,17 +371,18 @@ export default function newProductPage() {
                     </div>
                     <p className="text-sm text-gray-600">
                       Upload foto dan video alat kesehatan dengan pencahayaan
-                      yang baik
+                      yang baik untuk menampilkan detail produk dengan jelas
                     </p>
                   </div>
-                  {/* Media Upload - Mobile Optimized */}
-                  <div className="space-y-4 sm:space-y-6">
-                    {/* Main Product Image - Priority */}
-                    <div className="w-full p-4 border-2 border-blue-200 rounded-lg bg-blue-50/30">
-                      <label className="block text-base font-semibold text-gray-700 mb-3">
-                        📸 Foto Produk Utama (Wajib)
+
+                  {/* Media Upload Grid - Responsive */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    {/* Main Product Image */}
+                    <div className="w-full p-4 border border-blue-100 rounded-lg bg-blue-50/30">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        📸 Foto Produk Utama
                       </label>
-                      <div className="text-sm text-gray-600 mb-3">
+                      <div className="text-xs text-gray-600 mb-3">
                         Upload foto utama produk dengan kualitas terbaik
                       </div>
                       <UploadBoxCropperArea
@@ -390,14 +392,18 @@ export default function newProductPage() {
                         value={formik.values.image_url}
                       />
                     </div>
-                    {/* Secondary uploads - collapsible on mobile */}{" "}
-                    {/* Gallery Images - Full width */}
-                    <div className="w-full p-4 border border-green-200 rounded-lg bg-green-50/30">
+                  </div>
+
+                  {/* Gallery and 360 Images - Stack on mobile */}
+                  <div className="space-y-6">
+                    {/* Gallery Images */}
+                    <div className="w-full p-4 border border-green-100 rounded-lg bg-green-50/30">
                       <label className="block text-sm font-medium text-gray-700 mb-3">
                         🖼️ Gallery Foto Produk
                       </label>
-                      <div className="text-sm text-gray-600 mb-3">
-                        Upload beberapa foto produk dari sudut berbeda
+                      <div className="text-xs text-gray-600 mb-3">
+                        Upload beberapa foto produk dari sudut berbeda untuk
+                        memberikan gambaran yang lebih detail kepada customer
                       </div>
                       <GalleryUploader
                         value={formik.values.gallery_images}
@@ -408,13 +414,15 @@ export default function newProductPage() {
                         folderName="gallery"
                       />
                     </div>
-                    {/* 360 Images - Full width */}
-                    <div className="w-full p-4 border border-orange-200 rounded-lg bg-orange-50/30">
+
+                    {/* 360 Images */}
+                    <div className="w-full p-4 border border-orange-100 rounded-lg bg-orange-50/30">
                       <label className="block text-sm font-medium text-gray-700 mb-3">
                         🔄 Foto 360° Produk
                       </label>
-                      <div className="text-sm text-gray-600 mb-3">
-                        Upload folder yang berisi foto-foto 360° produk
+                      <div className="text-xs text-gray-600 mb-3">
+                        Upload folder yang berisi foto-foto 360° produk untuk
+                        tampilan interaktif yang dapat diputar customer
                       </div>
                       <Image360Uploader
                         value={formik.values.images360}
@@ -425,28 +433,29 @@ export default function newProductPage() {
                         folderName="360-images"
                       />
                     </div>
-                  </div>{" "}
-                  {/* Form Fields - Mobile Optimized */}
-                  <div className="space-y-4">
+                  </div>
+
+                  {/* Form Fields */}
+                  <div className="space-y-4 sm:space-y-6">
                     <InputText
                       label="Nama Alat Kesehatan"
-                      placeholder="Contoh: Stetoskop Digital Premium"
+                      placeholder="Contoh: Stetoskop Digital Premium / Tensimeter Otomatis"
                       id="name"
                       name="name"
                       required
-                      labelClassName="text-base font-medium"
-                      inputClassName="text-base p-4 h-auto min-h-[48px]"
+                      labelClassName="text-sm font-medium"
+                      inputClassName="text-sm p-3 h-auto"
                       containerClassName="gap-2"
                     />
 
                     <InputAutocompleteOptional
                       name="category_id"
-                      placeholder="Contoh: Alat Diagnostik"
+                      placeholder="Contoh: Alat Diagnostik / Peralatan Bedah"
                       label="Kategori Alat Kesehatan"
                       required
                       options={dataCategory || []}
-                      labelClassName="text-base font-medium"
-                      inputClassName="text-base p-4 h-auto min-h-[48px]"
+                      labelClassName="text-sm font-medium"
+                      inputClassName="text-sm p-3 h-auto"
                       containerClassName="gap-2"
                     />
 
@@ -457,15 +466,15 @@ export default function newProductPage() {
                         Link Pembelian
                       </div>
 
-                      <div className="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InputText
                           label="WhatsApp"
-                          placeholder="Link konsultasi via WhatsApp"
+                          placeholder="Link konsultasi & pemesanan via WhatsApp"
                           id="wa_link"
                           name="wa_link"
                           required
                           labelClassName="text-sm font-medium"
-                          inputClassName="text-base p-3 h-auto min-h-[48px]"
+                          inputClassName="text-sm p-3 h-auto"
                           containerClassName="gap-2"
                         />
                         <InputText
@@ -475,7 +484,7 @@ export default function newProductPage() {
                           name="tokopedia_link"
                           required
                           labelClassName="text-sm font-medium"
-                          inputClassName="text-base p-3 h-auto min-h-[48px]"
+                          inputClassName="text-sm p-3 h-auto"
                           containerClassName="gap-2"
                         />
                         <InputText
@@ -485,7 +494,7 @@ export default function newProductPage() {
                           name="shopee_link"
                           required
                           labelClassName="text-sm font-medium"
-                          inputClassName="text-base p-3 h-auto min-h-[48px]"
+                          inputClassName="text-sm p-3 h-auto"
                           containerClassName="gap-2"
                         />
                         <InputText
@@ -495,7 +504,7 @@ export default function newProductPage() {
                           name="bukalapak_link"
                           required
                           labelClassName="text-sm font-medium"
-                          inputClassName="text-base p-3 h-auto min-h-[48px]"
+                          inputClassName="text-sm p-3 h-auto"
                           containerClassName="gap-2"
                         />
                       </div>
@@ -504,7 +513,7 @@ export default function newProductPage() {
                     {/* Editor untuk deskripsi */}
                     {editorLoaded && (
                       <div className="space-y-3">
-                        <label className="text-base font-medium text-gray-700 block">
+                        <label className="text-sm font-medium text-gray-700 block">
                           Spesifikasi & Detail Produk
                         </label>
                         <div className="text-sm text-gray-600 mb-3">
@@ -522,16 +531,14 @@ export default function newProductPage() {
                       </div>
                     )}
 
-                    {/* Submit button - Mobile optimized */}
-                    <div className="pt-4">
-                      <Button
-                        loading={loading}
-                        onClick={() => formik.handleSubmit()}
-                        className="w-full bg-primary-main hover:bg-primary-dark text-white font-medium text-base p-4 min-h-[52px] rounded-lg shadow-md transition-all duration-200"
-                      >
-                        {loading ? "Menyimpan..." : "Simpan Alat Kesehatan"}
-                      </Button>
-                    </div>
+                    {/* Submit button */}
+                    <Button
+                      loading={loading}
+                      onClick={() => formik.handleSubmit()}
+                      className="w-full bg-primary-main hover:bg-primary-dark text-white font-medium text-base p-4 mt-6 rounded-lg shadow-md"
+                    >
+                      Simpan Alat Kesehatan
+                    </Button>
                   </div>
                 </div>
               </CardBody>

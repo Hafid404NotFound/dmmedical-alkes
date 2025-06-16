@@ -77,7 +77,6 @@ export default function Home() {
               <div className="w-[2px] h-6 bg-white/10 absolute"></div>
             </div>
           </div>
-
           {/* Medical cross symbols */}
           <div className="absolute top-[20%] right-6 w-6 h-6">
             <div className="w-full h-[2px] bg-white/10 absolute top-1/2 -translate-y-1/2"></div>
@@ -87,7 +86,6 @@ export default function Home() {
             <div className="w-full h-[2px] bg-white/10 absolute top-1/2 -translate-y-1/2"></div>
             <div className="h-full w-[2px] bg-white/10 absolute left-1/2 -translate-x-1/2"></div>
           </div>
-
           {/* Heartbeat line */}
           <div className="absolute top-8 left-1/4 right-1/4 h-[1px] bg-white/10">
             <div
@@ -95,13 +93,11 @@ export default function Home() {
               clip-path-[polygon(0_100%,30%_100%,45%_0,55%_0,70%_100%,100%_100%,100%_90%,75%_90%,60%_0,40%_0,25%_90%,0_90%)]"
             ></div>
           </div>
-
           {/* Medical hexagon */}
-          <div className="absolute bottom-12 right-12 w-16 h-16 border-2 border-white/10 rotate-45 hidden sm:block"></div>
-
+          <div className="absolute bottom-12 right-12 w-16 h-16 border-2 border-white/10 rotate-45 hidden sm:block"></div>{" "}
           {/* Main content container */}
           <div className="w-full h-full flex items-center justify-center py-3 sm:py-4 lg:py-0">
-            <div className="w-[85%] sm:w-[88%] lg:w-[90%] mx-auto relative">
+            <div className="w-[85%] sm:w-[88%] lg:w-[75%] xl:w-[85%] mx-auto relative">
               {" "}
               {/* Corner accents */}
               <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-white/10"></div>

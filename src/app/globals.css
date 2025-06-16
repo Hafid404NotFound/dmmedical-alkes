@@ -219,3 +219,45 @@ body {
 .hover\:to-red-800:hover {
   --tw-gradient-to: #991b1b;
 }
+
+/* Mobile optimizations for upload components */
+@media (max-width: 640px) {
+  .upload-area {
+    padding: 1rem;
+    min-height: 120px;
+  }
+
+  .upload-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  .form-field input,
+  .form-field textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .upload-thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .mobile-padding {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Touch targets for mobile */
+@media (max-width: 768px) {
+  button,
+  .btn,
+  input[type="file"] + label {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

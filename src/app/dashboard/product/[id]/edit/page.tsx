@@ -8,7 +8,9 @@ import InputAutocompleteOptional from "@/components/InputAutocompleteOptional";
 import InputText from "@/components/InputText";
 import PageTitle from "@/components/PageTitle";
 import UploadBoxCropperArea from "@/components/uploadBoxCropper";
-import VidioUplaoded from "@/components/VidioUploaded";
+import GalleryUploader from "@/components/GalleryUploader";
+import Image360Uploader from "@/components/Image360Uploader";
+import MigrationHelper from "@/components/MigrationHelper";
 import { ILabelValue } from "@/types/IlabelValue";
 import { IProduct } from "@/types/IProduct";
 import { IReqCreateNewProduct } from "@/types/IReqCreateNewProduct";
@@ -25,7 +27,8 @@ import {
   MdDescription,
   MdCategory,
   MdDriveFileRenameOutline,
-  MdCloudUpload, // Added for media section consistency
+  MdCloudUpload,
+  MdInventory,
 } from "react-icons/md";
 
 export default function EditProduct({
@@ -67,7 +70,6 @@ export default function EditProduct({
         });
     }
   }, [id, supabase, router]); // Added supabase and router to dependency array
-
   const handleEdit = async (e: IReqCreateNewProduct) => {
     setLoading(true);
     try {
@@ -77,12 +79,42 @@ export default function EditProduct({
         setLoading(false);
         return;
       }
+
+      // Prepare data for database
+      const productData: any = {
+        name: e.name?.trim() || "",
+        description: e.description?.trim() || "",
+        image_url: e.image_url?.trim() || "",
+        wa_link: e.wa_link?.trim() || "",
+        shopee_link: e.shopee_link?.trim() || "",
+        tokopedia_link: e.tokopedia_link?.trim() || "",
+        bukalapak_link: e.bukalapak_link?.trim() || "",
+        category_id: idCategory,
+      };
+
+      // Only add gallery_images if it exists and has content
+      if (e.gallery_images && e.gallery_images.length > 0) {
+        try {
+          productData.gallery_images = JSON.stringify(e.gallery_images);
+          console.log("Added gallery_images to productData");
+        } catch (err) {
+          console.warn("Failed to stringify gallery_images:", err);
+        }
+      }
+
+      // Only add images360 if it exists and has content
+      if (e.images360 && e.images360.length > 0) {
+        try {
+          productData.images360 = JSON.stringify(e.images360);
+          console.log("Added images360 to productData");
+        } catch (err) {
+          console.warn("Failed to stringify images360:", err);
+        }
+      }
+
       const { error } = await supabase
         .from("product")
-        .update({
-          ...e,
-          category_id: idCategory,
-        })
+        .update(productData)
         .eq("id", id);
 
       if (error) throw error;
@@ -95,11 +127,11 @@ export default function EditProduct({
       setLoading(false);
     }
   };
-
   const initValue: IReqCreateNewProduct = {
     description: "",
     image_url: "",
-    video_url: "",
+    gallery_images: [],
+    images360: [],
     name: "",
     bukalapak_link: "",
     category_id: "",
@@ -173,7 +205,28 @@ export default function EditProduct({
         category_id: String(data.category_id) || "", // Ensure category_id is a string for Autocomplete
         tokopedia_link: data.tokopedia_link || "",
         shopee_link: data.shopee_link || "",
-        video_url: data.video_url || "",
+        gallery_images: (() => {
+          try {
+            if (typeof data.gallery_images === "string") {
+              return JSON.parse(data.gallery_images) || [];
+            }
+            return Array.isArray(data.gallery_images)
+              ? data.gallery_images
+              : [];
+          } catch {
+            return [];
+          }
+        })(),
+        images360: (() => {
+          try {
+            if (typeof data.images360 === "string") {
+              return JSON.parse(data.images360) || [];
+            }
+            return Array.isArray(data.images360) ? data.images360 : [];
+          } catch {
+            return [];
+          }
+        })(),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,64 +250,100 @@ export default function EditProduct({
   return (
     <DashboardLayout>
       <DashboardContainer>
-        <div className="space-y-6 sm:space-y-8">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 sm:p-6 rounded-xl shadow-lg">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg shrink-0">
-                <MdLocalHospital className="text-xl sm:text-2xl text-white" />
-              </div>
-              <div>
-                <PageTitle title="Edit Alat Kesehatan" />
-                <p className="text-gray-500 text-xs sm:text-sm">
-                  Perbarui informasi dan spesifikasi alat kesehatan Anda.
-                </p>
-              </div>
+        <div className="space-y-4 sm:space-y-6 px-3 sm:px-0 max-w-4xl mx-auto">
+          {/* Migration Helper - only show in development */}
+          {process.env.NODE_ENV === "development" && <MigrationHelper />}
+
+          {/* Header */}
+          <div className="flex items-center gap-3 sm:gap-4 bg-white p-4 sm:p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary-main to-secondary-main flex items-center justify-center shadow-lg flex-shrink-0">
+              <MdLocalHospital className="text-xl text-white" />
+            </div>
+            <div>
+              <PageTitle
+                title="Edit Alat Kesehatan"
+                className="text-lg sm:text-xl"
+              />
+              <p className="text-gray-500 text-sm">
+                Perbarui informasi detail alat kesehatan untuk katalog
+              </p>
             </div>
           </div>
 
           <FormikProvider value={formik}>
+            {" "}
             <Card>
-              <CardBody>
-                <div className="flex flex-col gap-6 sm:gap-8">
+              <CardBody className="p-4 sm:p-6">
+                <div className="space-y-4 sm:space-y-6">
+                  {/* Migration Helper - only show in development */}
+                  {process.env.NODE_ENV === "development" && (
+                    <MigrationHelper />
+                  )}
                   {/* Media Section */}
-                  <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
-                    <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
-                      <MdCloudUpload className="text-xl sm:text-2xl" />
-                      <h2 className="text-base sm:text-lg">
-                        Media Alat Kesehatan
-                      </h2>
+                  <div className="bg-blue-50/70 p-4 rounded-lg border border-blue-100">
+                    <div className="flex items-center gap-2 text-primary-main font-medium text-base mb-2">
+                      <MdMedicalServices className="text-xl" />
+                      Media Alat Kesehatan
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-5">
-                      Upload foto dan video yang menampilkan detail alat
-                      kesehatan dengan jelas.
+                    <p className="text-sm text-gray-600">
+                      Upload foto dan video alat kesehatan dengan pencahayaan
+                      yang baik
                     </p>
-
-                    <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-                      <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
-                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
-                          Video Demonstrasi (Link YouTube/Vimeo)
-                        </label>
-                        <VidioUplaoded
-                          value={formik.values.video_url}
-                          onChange={(e) => formik.setFieldValue("video_url", e)}
-                        />
+                  </div>
+                  {/* Media Upload - Mobile Optimized */}
+                  <div className="space-y-4 sm:space-y-6">
+                    {/* Main Product Image - Priority */}
+                    <div className="w-full p-4 border-2 border-blue-200 rounded-lg bg-blue-50/30">
+                      <label className="block text-base font-semibold text-gray-700 mb-3">
+                        📸 Foto Produk Utama (Wajib)
+                      </label>
+                      <div className="text-sm text-gray-600 mb-3">
+                        Upload foto utama produk dengan kualitas terbaik
                       </div>
+                      <UploadBoxCropperArea
+                        folderName="POST"
+                        ratio={1}
+                        onChange={(e) => formik.setFieldValue("image_url", e)}
+                        value={formik.values.image_url}
+                      />
+                    </div>
 
-                      <div className="p-3 sm:p-4 border border-gray-200 rounded-lg bg-white">
-                        <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
-                          Foto Produk Utama
-                        </label>
-                        <UploadBoxCropperArea
-                          folderName="POST"
-                          ratio={1}
-                          onChange={(e) => formik.setFieldValue("image_url", e)}
-                          value={formik.values.image_url}
-                        />
+                    {/* Gallery Images - Full width */}
+                    <div className="w-full p-4 border border-green-200 rounded-lg bg-green-50/30">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        🖼️ Gallery Foto Produk
+                      </label>
+                      <div className="text-sm text-gray-600 mb-3">
+                        Upload beberapa foto produk dari sudut berbeda
                       </div>
+                      <GalleryUploader
+                        value={formik.values.gallery_images}
+                        onChange={(images) =>
+                          formik.setFieldValue("gallery_images", images)
+                        }
+                        maxImages={5}
+                        folderName="gallery"
+                      />
+                    </div>
+
+                    {/* 360 Images - Full width */}
+                    <div className="w-full p-4 border border-orange-200 rounded-lg bg-orange-50/30">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        🔄 Foto 360° Produk
+                      </label>
+                      <div className="text-sm text-gray-600 mb-3">
+                        Upload folder yang berisi foto-foto 360° produk
+                      </div>
+                      <Image360Uploader
+                        value={formik.values.images360}
+                        onChange={(images) =>
+                          formik.setFieldValue("images360", images)
+                        }
+                        maxImages={36}
+                        folderName="360-images"
+                      />
                     </div>
                   </div>
-
                   {/* Product Info Section */}
                   <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
                     <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
@@ -263,113 +352,114 @@ export default function EditProduct({
                         Informasi Dasar Produk
                       </h2>
                     </div>
-                    <div className="grid gap-4 sm:gap-5">
+                    {/* Form Fields - Mobile Optimized */}
+                    <div className="space-y-4">
                       <InputText
                         label="Nama Alat Kesehatan"
                         placeholder="Contoh: Stetoskop Digital Premium"
                         id="name"
                         name="name"
                         required
-                        startIcon={
-                          <MdDriveFileRenameOutline className="text-gray-400" />
-                        }
+                        labelClassName="text-base font-medium"
+                        inputClassName="text-base p-4 h-auto min-h-[48px]"
+                        containerClassName="gap-2"
                       />
 
-                      {dataCategory.length > 0 && (
-                        <InputAutocompleteOptional
-                          name="category_id"
-                          placeholder="Pilih atau buat kategori baru"
-                          label="Kategori Alat Kesehatan"
-                          required
-                          options={dataCategory}
-                          value={formik.values.category_id}
-                          onChange={(option) =>
-                            formik.setFieldValue(
-                              "category_id",
-                              option ? option : ""
-                            )
-                          }
-                        />
-                      )}
-                    </div>
-                  </div>
+                      <InputAutocompleteOptional
+                        name="category_id"
+                        placeholder="Contoh: Alat Diagnostik"
+                        label="Kategori Alat Kesehatan"
+                        required
+                        options={dataCategory || []}
+                        labelClassName="text-base font-medium"
+                        inputClassName="text-base p-4 h-auto min-h-[48px]"
+                        containerClassName="gap-2"
+                      />
 
-                  {/* Marketplace Links Section */}
-                  <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
-                    <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
-                      <MdLink className="text-xl sm:text-2xl" />
-                      <h2 className="text-base sm:text-lg">
-                        Link Pembelian (Opsional)
-                      </h2>
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-5">
-                      Tambahkan link ke halaman produk Anda di berbagai
-                      marketplace.
-                    </p>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <InputText
-                        label="WhatsApp"
-                        placeholder="Contoh: https://wa.me/62..."
-                        id="wa_link"
-                        name="wa_link"
-                        // required // Kept as per original, but consider if truly required
-                      />
-                      <InputText
-                        label="Tokopedia"
-                        placeholder="Contoh: https://tokopedia.com/..."
-                        id="tokopedia_link"
-                        name="tokopedia_link"
-                        // required
-                      />
-                      <InputText
-                        label="Shopee"
-                        placeholder="Contoh: https://shopee.co.id/..."
-                        id="shopee_link"
-                        name="shopee_link"
-                        // required
-                      />
-                      <InputText
-                        label="Bukalapak"
-                        placeholder="Contoh: https://bukalapak.com/..."
-                        id="bukalapak_link"
-                        name="bukalapak_link"
-                        // required
-                      />
-                    </div>
-                  </div>
+                      {/* Purchase Links Section */}
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 text-gray-700 font-medium text-base mb-4">
+                          <MdInventory className="text-xl text-secondary-main" />
+                          Link Pembelian
+                        </div>
 
-                  {/* Description Editor Section */}
-                  {editorLoaded && (
-                    <div className="bg-gray-50/50 p-4 sm:p-5 rounded-lg border border-gray-200">
-                      <div className="flex items-center gap-2 text-primary-main font-semibold mb-3">
-                        <MdDescription className="text-xl sm:text-2xl" />
-                        <h2 className="text-base sm:text-lg">
-                          Spesifikasi & Detail Produk
-                        </h2>
+                        <div className="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
+                          <InputText
+                            label="WhatsApp"
+                            placeholder="Link konsultasi via WhatsApp"
+                            id="wa_link"
+                            name="wa_link"
+                            required
+                            labelClassName="text-sm font-medium"
+                            inputClassName="text-base p-3 h-auto min-h-[48px]"
+                            containerClassName="gap-2"
+                          />
+                          <InputText
+                            label="Tokopedia"
+                            placeholder="Link pembelian di Tokopedia"
+                            id="tokopedia_link"
+                            name="tokopedia_link"
+                            required
+                            labelClassName="text-sm font-medium"
+                            inputClassName="text-base p-3 h-auto min-h-[48px]"
+                            containerClassName="gap-2"
+                          />
+                          <InputText
+                            label="Shopee"
+                            placeholder="Link pembelian di Shopee"
+                            id="shopee_link"
+                            name="shopee_link"
+                            required
+                            labelClassName="text-sm font-medium"
+                            inputClassName="text-base p-3 h-auto min-h-[48px]"
+                            containerClassName="gap-2"
+                          />
+                          <InputText
+                            label="Bukalapak"
+                            placeholder="Link pembelian di Bukalapak"
+                            id="bukalapak_link"
+                            name="bukalapak_link"
+                            required
+                            labelClassName="text-sm font-medium"
+                            inputClassName="text-base p-3 h-auto min-h-[48px]"
+                            containerClassName="gap-2"
+                          />{" "}
+                        </div>
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
-                        Jelaskan spesifikasi teknis, manfaat, dan cara
-                        penggunaan alat kesehatan secara detail.
-                      </p>
-                      <InputEditor
-                        editorLoaded={editorLoaded}
-                        name="description"
-                        onChange={(data) =>
-                          formik.setFieldValue("description", data)
-                        }
-                        value={formik.values.description}
-                      />
-                    </div>
-                  )}
 
-                  <Button
-                    loading={loading}
-                    onClick={() => formik.handleSubmit()}
-                    className="w-full sm:w-auto sm:self-end bg-primary-main hover:bg-primary-dark text-white font-semibold py-2.5 sm:py-3 px-6 rounded-lg flex items-center justify-center gap-2 text-sm sm:text-base transition-colors duration-150 shadow-md hover:shadow-lg"
-                  >
-                    <MdSave className="text-lg sm:text-xl" />
-                    Simpan Perubahan
-                  </Button>
+                      {/* Editor untuk deskripsi */}
+                      {editorLoaded && (
+                        <div className="space-y-3">
+                          <label className="text-base font-medium text-gray-700 block">
+                            Spesifikasi & Detail Produk
+                          </label>
+                          <div className="text-sm text-gray-600 mb-3">
+                            Jelaskan spesifikasi teknis, manfaat, dan cara
+                            penggunaan alat kesehatan secara detail
+                          </div>
+                          <InputEditor
+                            editorLoaded={editorLoaded}
+                            name="description"
+                            onChange={(e) =>
+                              formik.setFieldValue("description", e)
+                            }
+                            value={formik.values.description}
+                          />
+                        </div>
+                      )}
+
+                      {/* Submit button - Mobile optimized */}
+                      <div className="pt-4">
+                        <Button
+                          loading={loading}
+                          onClick={() => formik.handleSubmit()}
+                          className="w-full bg-primary-main hover:bg-primary-dark text-white font-medium text-base p-4 min-h-[52px] rounded-lg shadow-md transition-all duration-200"
+                        >
+                          {loading ? "Menyimpan..." : "Simpan Perubahan"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>{" "}
                 </div>
               </CardBody>
             </Card>
