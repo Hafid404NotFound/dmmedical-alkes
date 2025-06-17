@@ -207,12 +207,11 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
     setIsDragging(true)
     setStartX(e.clientX)
   }, [isExperimentActive])
-
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isDragging || !isExperimentActive) return
 
     const deltaX = e.clientX - startX
-    const sensitivity = 2
+    const sensitivity = 2.5 // Slightly more sensitive for desktop
     const indexChange = Math.floor(Math.abs(deltaX) / sensitivity)
 
     if (indexChange > 0) {
@@ -234,18 +233,19 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
   }, [])
-
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!isExperimentActive) return
+    e.preventDefault(); // Prevent scrolling on mobile
     setIsDragging(true)
     setStartX(e.touches[0].clientX)
   }, [isExperimentActive])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isDragging || !isExperimentActive) return
+    e.preventDefault(); // Prevent scrolling on mobile
 
     const deltaX = e.touches[0].clientX - startX
-    const sensitivity = 2
+    const sensitivity = window.innerWidth > 768 ? 2 : 1.5 // More sensitive on mobile
     const indexChange = Math.floor(Math.abs(deltaX) / sensitivity)
 
     if (indexChange > 0) {
@@ -295,17 +295,16 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
     setOverallRating(0)
     setComments('')
   }
-
   const RatingStars = ({ rating, setRating, label }: { rating: number, setRating: (rating: number) => void, label: string }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium mb-2">{label}</label>
-      <div className="flex space-x-1">
+    <div className="mb-3 md:mb-4">
+      <label className="block text-xs md:text-sm font-medium mb-1 md:mb-2">{label}</label>
+      <div className="flex space-x-1 justify-center md:justify-start">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             onClick={() => setRating(star)}
-            className={`text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} hover:text-yellow-400 transition-colors`}
+            className={`text-xl md:text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} hover:text-yellow-400 transition-colors touch-manipulation`}
           >
             ★
           </button>
@@ -316,25 +315,23 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
 
   return (
     <div className="w-full max-w-2xl mx-auto">      {/* Experiment Info */}
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-2">Experiment: {imageCount} Gambar 360°</h3>
-        <p className="text-sm text-gray-600 mb-2">
-          Menggunakan gambar dari folder: <code className="bg-gray-200 px-1 rounded">/gambar 360/{imageCount}gambar/</code>
+      <div className="mb-4 md:mb-6 p-3 md:p-4 bg-blue-50 rounded-lg">
+        <h3 className="text-base md:text-lg font-semibold mb-2">Experiment: {imageCount} Gambar 360°</h3>
+        <p className="text-xs md:text-sm text-gray-600 mb-2">
+          Menggunakan gambar dari folder: <code className="bg-gray-200 px-1 rounded text-xs">/gambar 360/{imageCount}gambar/</code>
         </p>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 text-xs md:text-sm">
           <div>Status: <span className={isExperimentActive ? 'text-green-600 font-semibold' : 'text-gray-600'}>{isExperimentActive ? 'Aktif' : 'Standby'}</span></div>
-          <div>Waktu Interaksi: {Math.round(interactionTime / 1000)}s</div>
-          <div>Jumlah Rotasi: {rotationCount}</div>
-          <div>Gambar Saat Ini: {currentIndex + 1}/{imageCount}</div>
-          <div>Sudut per Frame: {Math.round(360 / imageCount)}°</div>
-          <div>Total Gambar: {images.length} files</div>
+          <div>Waktu: {Math.round(interactionTime / 1000)}s</div>
+          <div>Rotasi: {rotationCount}</div>
+          <div>Gambar: {currentIndex + 1}/{imageCount}</div>
+          <div>Sudut: {Math.round(360 / imageCount)}°</div>
+          <div className="hidden md:block">Total: {images.length} files</div>
         </div>
-      </div>
-
-      {/* 360° Viewer */}
+      </div>      {/* 360° Viewer */}
       <div 
         ref={containerRef}
-        className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none"
+        className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none touch-pan-x"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -347,45 +344,56 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
           src={images[currentIndex]}
           alt={`360° view ${currentIndex + 1}`}
           fill
-          className="object-contain"
+          className="object-contain pointer-events-none"
           priority
           draggable={false}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         
         {/* Overlay info */}
-        <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded text-sm">
+        <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-black bg-opacity-70 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm">
           {currentIndex + 1} / {imageCount}
         </div>
         
+        {/* Mobile instruction overlay */}
         {!isExperimentActive && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="text-white text-center">
-              <p className="mb-4">Siap untuk memulai experiment?</p>
-              <Button onClick={startExperiment} className="bg-blue-600 hover:bg-blue-700">
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="text-white text-center max-w-xs md:max-w-none">
+              <p className="mb-3 md:mb-4 text-sm md:text-base">Siap untuk memulai experiment?</p>
+              <p className="mb-4 text-xs md:text-sm text-gray-300 md:hidden">
+                Gunakan gesture swipe atau drag untuk memutar
+              </p>
+              <Button 
+                onClick={startExperiment} 
+                className="bg-blue-600 hover:bg-blue-700 text-sm md:text-base px-4 md:px-6 py-2"
+              >
                 Mulai Experiment
               </Button>
             </div>
           </div>
         )}
-      </div>
-
-      {/* Experiment Controls */}
+      </div>      {/* Experiment Controls */}
       {isExperimentActive && (
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600 mb-4">
-            Drag atau swipe untuk memutar gambar 360°. Rasakan smoothness dan responsivitas.
+        <div className="mt-3 md:mt-4 text-center px-2">
+          <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
+            <span className="md:hidden">Swipe untuk memutar gambar 360°</span>
+            <span className="hidden md:inline">Drag atau swipe untuk memutar gambar 360°</span>
+            <br className="md:hidden" />
+            <span className="text-xs">Rasakan smoothness dan responsivitas.</span>
           </p>
-          <Button onClick={endExperiment} className="bg-red-600 hover:bg-red-700">
+          <Button 
+            onClick={endExperiment} 
+            className="bg-red-600 hover:bg-red-700 text-sm md:text-base px-4 md:px-6 py-2"
+          >
             Selesai Experiment
           </Button>
         </div>
       )}
 
       {/* Rating Form Modal */}
-      {showRatingForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-semibold mb-4">Rating Experiment ({imageCount} Gambar)</h3>
+      {showRatingForm && (        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 md:p-4">
+          <div className="bg-white rounded-lg w-full max-w-sm md:max-w-md max-h-[90vh] overflow-y-auto p-4 md:p-6 mx-2">
+            <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Rating Experiment ({imageCount} Gambar)</h3>
             
             <RatingStars 
               rating={smoothnessRating} 
@@ -409,29 +417,27 @@ export default function ExperimentViewer360({ imageCount, onExperimentComplete }
               rating={overallRating} 
               setRating={setOverallRating} 
               label="Overall Experience (Pengalaman Keseluruhan)" 
-            />
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Komentar Tambahan</label>
+            />            <div className="mb-4 md:mb-6">
+              <label className="block text-xs md:text-sm font-medium mb-2">Komentar Tambahan</label>
               <textarea
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 md:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 rows={3}
                 placeholder="Berikan feedback tentang pengalaman menggunakan viewer dengan jumlah gambar ini..."
               />
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
               <Button 
                 onClick={submitRating}
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-sm md:text-base py-2 md:py-3"
               >
                 Submit Rating
               </Button>              <Button 
                 onClick={() => setShowRatingForm(false)}
                 variant="secondary"
-                className="flex-1"
+                className="flex-1 text-sm md:text-base py-2 md:py-3"
               >
                 Batal
               </Button>

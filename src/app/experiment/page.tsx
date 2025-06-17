@@ -114,65 +114,61 @@ export default function ExperimentPage() {
   };
 
   const averageRatings = getAverageRatings();
-
   return (
     <PageContainer>      <PageTitle title="Eksperimen Viewer 360° - Justifikasi 36 Gambar" />
-      <p className="text-gray-600 text-center mb-8">
+      <p className="text-gray-600 text-center mb-6 md:mb-8 text-sm md:text-base px-4">
         Studi komparatif untuk menentukan jumlah optimal gambar dalam viewer 360°
       </p>
 
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Penjelasan Eksperimen */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Tujuan Eksperimen</h2>
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 px-4 md:px-0">        {/* Penjelasan Eksperimen */}
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Tujuan Eksperimen</h2>
           <div className="prose max-w-none">
-            <p className="text-gray-700 mb-4">
+            <p className="text-gray-700 mb-3 md:mb-4 text-sm md:text-base">
               Eksperimen ini bertujuan untuk memvalidasi penggunaan 36 gambar sebagai jumlah optimal 
               untuk viewer 360° pada produk alat kesehatan dengan mempertimbangkan:
             </p>
-            <ul className="list-disc list-inside text-gray-700 space-y-2">
+            <ul className="list-disc list-inside text-gray-700 space-y-1 md:space-y-2 text-sm md:text-base">
               <li><strong>Kelancaran Rotasi:</strong> Seberapa smooth perpindahan antar frame</li>
               <li><strong>Kejelasan Detail:</strong> Kemampuan melihat detail produk dengan jelas</li>
               <li><strong>Kemudahan Penggunaan:</strong> User experience secara keseluruhan</li>
               <li><strong>Performa Loading:</strong> Waktu yang dibutuhkan untuk memuat gambar</li>
             </ul>
           </div>
-        </div>
-
-        {/* Kontrol Eksperimen */}
+        </div>        {/* Kontrol Eksperimen */}
         {!isCompleted && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
               Eksperimen {experimentIndex + 1} dari {EXPERIMENT_CONFIGS.length}
             </h2>
               {currentExperiment === null ? (
               <div>
-                <p className="text-gray-700 mb-2">
+                <p className="text-gray-700 mb-2 text-sm md:text-base">
                   Silakan uji konfigurasi: <strong>{EXPERIMENT_CONFIGS[experimentIndex].name}</strong>
                 </p>
-                <p className="text-sm text-gray-600 mb-4">
-                  📁 Folder: <code className="bg-gray-100 px-2 py-1 rounded">gambar 360/{EXPERIMENT_CONFIGS[experimentIndex].folder}/</code><br/>
+                <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
+                  📁 Folder: <code className="bg-gray-100 px-2 py-1 rounded text-xs">gambar 360/{EXPERIMENT_CONFIGS[experimentIndex].folder}/</code><br/>
                   📐 Sudut per frame: <strong>{EXPERIMENT_CONFIGS[experimentIndex].angle}</strong>
                 </p>
                 <Button 
                   onClick={() => startExperiment(experimentIndex)}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-sm md:text-base"
                 >
                   Mulai Eksperimen {EXPERIMENT_CONFIGS[experimentIndex].name}
                 </Button>
               </div>
-            ) : (              <ExperimentViewer360
-                imageCount={currentExperiment}
-                onExperimentComplete={handleExperimentResult}
-              />
+            ) : (              <div className="w-full">
+                <ExperimentViewer360
+                  imageCount={currentExperiment}
+                  onExperimentComplete={handleExperimentResult}
+                />
+              </div>
             )}
           </div>
-        )}
-
-        {/* Progress Eksperimen */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Progress Eksperimen</h2>
-          <div className="flex space-x-4 mb-4">
+        )}        {/* Progress Eksperimen */}
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Progress Eksperimen</h2>
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mb-4">
             {EXPERIMENT_CONFIGS.map((config, index) => (              <div 
                 key={config.count}
                 className={`flex-1 p-3 rounded-lg text-center ${
@@ -181,9 +177,9 @@ export default function ExperimentPage() {
                   'bg-gray-100 text-gray-600'
                 }`}
               >
-                <div className="font-semibold">{config.name}</div>
+                <div className="font-semibold text-sm md:text-base">{config.name}</div>
                 <div className="text-xs text-gray-600">{config.folder}/ • {config.angle}</div>
-                <div className="text-sm">
+                <div className="text-xs md:text-sm">
                   {index < experimentIndex ? '✓ Selesai' :
                    index === experimentIndex ? '→ Sedang Berjalan' :
                    '○ Menunggu'}
@@ -191,53 +187,69 @@ export default function ExperimentPage() {
               </div>
             ))}
           </div>          
-          <div className="text-center space-x-4">
+          <div className="text-center space-y-2 md:space-y-0 md:space-x-4 flex flex-col md:flex-row">
             {results.length > 0 && (
               <>
                 <Button 
                   onClick={resetExperiment}
                   variant="secondary"
+                  className="text-sm md:text-base"
                 >
                   Reset Eksperimen
                 </Button>
                 <Button 
                   onClick={exportResults}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 text-sm md:text-base"
                 >
                   Export Data CSV
                 </Button>
               </>
             )}
           </div>
-        </div>
-
-        {/* Hasil Real-time */}
+        </div>        {/* Hasil Real-time */}
         {results.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Hasil Eksperimen</h2>
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Hasil Eksperimen</h2>
             
-            {/* Tabel Hasil Individual */}
-            <div className="overflow-x-auto mb-6">
+            {/* Tabel Hasil Individual - Mobile Card View */}
+            <div className="md:hidden mb-6">
+              <h3 className="text-base font-semibold mb-3">Data Individual</h3>
+              {results.map((result, index) => (
+                <div key={index} className="bg-gray-50 rounded-lg p-3 mb-3">
+                  <div className="font-semibold text-blue-600 mb-2">{result.imageCount} Gambar</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>Kelancaran: {result.smoothnessRating}/5</div>
+                    <div>Kejelasan: {result.clarityRating}/5</div>
+                    <div>Kemudahan: {result.usabilityRating}/5</div>
+                    <div>Overall: {result.overallRating}/5</div>
+                    <div className="col-span-2">Loading: {result.loadTime.toFixed(0)}ms</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tabel Hasil Individual - Desktop */}
+            <div className="hidden md:block overflow-x-auto mb-6">
               <table className="min-w-full table-auto">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-left">Jumlah Gambar</th>
-                    <th className="px-4 py-2 text-left">Kelancaran</th>
-                    <th className="px-4 py-2 text-left">Kejelasan</th>
-                    <th className="px-4 py-2 text-left">Kemudahan</th>
-                    <th className="px-4 py-2 text-left">Overall</th>
-                    <th className="px-4 py-2 text-left">Loading (ms)</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Jumlah Gambar</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Kelancaran</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Kejelasan</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Kemudahan</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Overall</th>
+                    <th className="px-3 md:px-4 py-2 text-left text-sm">Loading (ms)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results.map((result, index) => (
                     <tr key={index} className="border-t">
-                      <td className="px-4 py-2 font-semibold">{result.imageCount}</td>
-                      <td className="px-4 py-2">{result.smoothnessRating}/5</td>
-                      <td className="px-4 py-2">{result.clarityRating}/5</td>
-                      <td className="px-4 py-2">{result.usabilityRating}/5</td>
-                      <td className="px-4 py-2">{result.overallRating}/5</td>
-                      <td className="px-4 py-2">{result.loadTime.toFixed(0)}</td>
+                      <td className="px-3 md:px-4 py-2 font-semibold text-sm">{result.imageCount}</td>
+                      <td className="px-3 md:px-4 py-2 text-sm">{result.smoothnessRating}/5</td>
+                      <td className="px-3 md:px-4 py-2 text-sm">{result.clarityRating}/5</td>
+                      <td className="px-3 md:px-4 py-2 text-sm">{result.usabilityRating}/5</td>
+                      <td className="px-3 md:px-4 py-2 text-sm">{result.overallRating}/5</td>
+                      <td className="px-3 md:px-4 py-2 text-sm">{result.loadTime.toFixed(0)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -247,10 +259,10 @@ export default function ExperimentPage() {
             {/* Analisis Rata-rata */}
             {averageRatings && (
               <div>
-                <h3 className="text-lg font-semibold mb-3">Analisis Rata-rata</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <h3 className="text-base md:text-lg font-semibold mb-3">Analisis Rata-rata</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                   {averageRatings.map((avg) => (
-                    <div key={avg.imageCount} className="bg-gray-50 rounded-lg p-4">
+                    <div key={avg.imageCount} className="bg-gray-50 rounded-lg p-3 md:p-4">
                       <h4 className="font-semibold text-center mb-2">{avg.imageCount} Gambar</h4>
                       <div className="space-y-1 text-sm">
                         <div>Kelancaran: <span className="font-semibold">{avg.smoothness.toFixed(1)}/5</span></div>
