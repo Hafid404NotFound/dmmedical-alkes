@@ -30,10 +30,34 @@ export default function Image360Uploader({
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    // Filter only image files and sort them
+    // Filter only image files and sort them with natural sorting
     const imageFiles = Array.from(files)
-      .filter((file) => file.type.startsWith("image/"))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .filter((file) => {
+        // Validasi lebih ketat untuk file gambar
+        const validTypes = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/webp",
+        ];
+        return validTypes.includes(file.type.toLowerCase());
+      })
+      .sort((a, b) => {
+        // Natural sorting untuk nama file dengan angka
+        return a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
+      });
+
+    // Debug log untuk melihat urutan file
+    console.log(
+      "Files to upload:",
+      imageFiles.map((f, i) => `${i + 1}. ${f.name}`)
+    );
+
+    // Validasi urutan file sebelum upload
+    validateFileOrder(imageFiles);
 
     if (imageFiles.length === 0) {
       toast.error("Tidak ada file gambar yang ditemukan dalam folder");
@@ -47,34 +71,111 @@ export default function Image360Uploader({
 
     setUploading(true);
     const uploadedUrls: string[] = [];
+    const failedUploads: { file: File; error: string }[] = [];
 
     try {
+      // Upload files secara berurutan untuk mempertahankan urutan
       for (let i = 0; i < imageFiles.length; i++) {
         const file = imageFiles[i];
-        const uploadResult = await uploadService.uploadBlob(file, folderName);
+        let uploadResult: string | null = null;
+        let retryCount = 0;
+        const maxRetries = 3;
 
-        if (uploadResult) {
-          uploadedUrls.push(uploadResult);
+        // Retry mechanism untuk setiap file
+        while (!uploadResult && retryCount <= maxRetries) {
+          try {
+            uploadResult =
+              (await uploadService.uploadBlob(file, folderName)) || null;
 
-          // Update progress
-          toast.loading(
-            `Mengupload gambar ${i + 1} dari ${imageFiles.length}...`,
-            {
-              id: "upload-progress",
+            if (uploadResult) {
+              console.log(
+                `✅ Upload berhasil [${i + 1}]: ${file.name} -> ${uploadResult}`
+              );
+              uploadedUrls.push(uploadResult);
+              break;
+            } else {
+              throw new Error("Upload service returned null");
             }
-          );
-        } else {
-          throw new Error(`Gagal upload ${file.name}`);
+          } catch (uploadError: any) {
+            retryCount++;
+            const errorMessage = uploadError?.message || "Unknown error";
+
+            console.warn(
+              `⚠️ Upload attempt ${retryCount} failed for ${file.name}: ${errorMessage}`
+            );
+
+            if (retryCount <= maxRetries) {
+              // Wait before retry
+              await new Promise((resolve) =>
+                setTimeout(resolve, 1000 * retryCount)
+              );
+              toast.loading(`Retry ${retryCount}/${maxRetries}: ${file.name}`, {
+                id: "upload-progress",
+              });
+            }
+          }
         }
+
+        if (!uploadResult) {
+          const errorMsg = "File processing error";
+          failedUploads.push({
+            file,
+            error: errorMsg,
+          });
+          console.error(
+            `❌ Failed to upload ${file.name} after ${maxRetries} attempts`
+          );
+        }
+
+        // Update progress indicator
+        const successCount = uploadedUrls.length;
+        const failedCount = failedUploads.length;
+        const processed = successCount + failedCount;
+
+        console.log(
+          `Progress: ${processed}/${imageFiles.length} | Success: ${successCount} | Failed: ${failedCount}`
+        );
       }
 
-      onChange([...value, ...uploadedUrls]);
-      toast.success(`Berhasil mengupload ${uploadedUrls.length} gambar 360°`, {
-        id: "upload-progress",
-      });
-    } catch (error) {
+      // Validasi hasil upload
+      console.log("=== UPLOAD SUMMARY ===");
+      console.log(`Total files: ${imageFiles.length}`);
+      console.log(`Successful uploads: ${uploadedUrls.length}`);
+      console.log(`Failed uploads: ${failedUploads.length}`);
+      console.log(`Uploaded URLs:`, uploadedUrls);
+      if (failedUploads.length > 0) {
+        console.log(`Failed files:`, failedUploads);
+      }
+
+      // Update state hanya jika ada upload yang berhasil
+      if (uploadedUrls.length > 0) {
+        // Pastikan urutan gambar sesuai dengan yang diupload
+        onChange([...value, ...uploadedUrls]);
+
+        // Success message dengan detail
+        const successMsg =
+          failedUploads.length > 0
+            ? `Berhasil upload ${uploadedUrls.length} dari ${imageFiles.length} gambar. ${failedUploads.length} gagal.`
+            : `Berhasil mengupload ${uploadedUrls.length} gambar 360° secara berurutan!`;
+
+        toast.success(successMsg, {
+          id: "upload-progress",
+        });
+
+        if (failedUploads.length > 0) {
+          toast.error(
+            `Gagal upload: ${failedUploads.map((f) => f.file.name).join(", ")}`,
+            { duration: 5000 }
+          );
+        }
+      } else {
+        toast.error("Semua upload gagal. Coba lagi.", {
+          id: "upload-progress",
+        });
+      }
+    } catch (error: any) {
       console.error("Upload error:", error);
-      toast.error(`Gagal mengupload: ${error}`, {
+      toast.error(`❌ Error upload: ${error?.message || error}`, {
         id: "upload-progress",
       });
     } finally {
@@ -113,6 +214,61 @@ export default function Image360Uploader({
     if (value.length > 0) {
       setCurrentIndex((prev) => (prev - 1 + value.length) % value.length);
     }
+  };
+
+  // Helper function untuk validasi urutan file
+  const validateFileOrder = (files: File[]) => {
+    console.log("=== VALIDASI URUTAN FILE ===");
+    const fileNames = files.map((f) => f.name);
+
+    // Cek pola penamaan
+    const numberPattern = /(\d+)/;
+    const numberedFiles = fileNames.map((name, index) => {
+      const match = name.match(numberPattern);
+      return {
+        originalIndex: index,
+        name,
+        number: match ? parseInt(match[1]) : 999,
+        hasNumber: !!match,
+      };
+    });
+
+    // Sort berdasarkan nomor
+    const sortedByNumber = [...numberedFiles].sort(
+      (a, b) => a.number - b.number
+    );
+
+    console.log("File asli:", fileNames);
+    console.log(
+      "File setelah sort:",
+      sortedByNumber.map((f) => f.name)
+    );
+
+    // Cek apakah ada gap dalam nomor
+    const numbers = sortedByNumber
+      .filter((f) => f.hasNumber)
+      .map((f) => f.number);
+    const gaps = [];
+    for (let i = 1; i < numbers.length; i++) {
+      if (numbers[i] - numbers[i - 1] > 1) {
+        gaps.push(`Gap antara ${numbers[i - 1]} dan ${numbers[i]}`);
+      }
+    }
+
+    if (gaps.length > 0) {
+      console.warn("⚠️ Gap ditemukan dalam urutan:", gaps);
+    }
+
+    // Cek file tanpa nomor
+    const unnumberedFiles = numberedFiles.filter((f) => !f.hasNumber);
+    if (unnumberedFiles.length > 0) {
+      console.warn(
+        "⚠️ File tanpa nomor:",
+        unnumberedFiles.map((f) => f.name)
+      );
+    }
+
+    console.log("===============================");
   };
 
   return (
@@ -163,14 +319,6 @@ export default function Image360Uploader({
                 {value.length} gambar 360° tersimpan
               </div>
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 disabled:opacity-50"
-                >
-                  + Tambah Folder
-                </button>
                 <button
                   type="button"
                   onClick={removeAllImages}
@@ -301,6 +449,18 @@ export default function Image360Uploader({
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Upload Progress */}
+      {uploading && (
+        <div className="mt-4">
+          <div className="text-xs text-gray-500 mb-2">
+            Mengupload gambar, mohon tunggu...
+          </div>
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-full bg-primary-main animate-upload" />
           </div>
         </div>
       )}
