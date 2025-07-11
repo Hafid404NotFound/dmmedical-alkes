@@ -1,7 +1,7 @@
 "use client";
 import Button from "@/components/Button";
 import { Card, CardBody } from "@/components/Card";
-import InputEditor from "@/components/CKeditor";
+import SafeCKEditor from "@/components/SafeCKEditor";
 import DashboardContainer from "@/components/DashboardContainer";
 import DashboardLayout from "@/components/DashboardLayout";
 import InputAutocompleteOptional from "@/components/InputAutocompleteOptional";
@@ -39,7 +39,6 @@ export default function EditProduct({
   const { id } = use(params);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [editorLoaded, setEditorLoaded] = useState(false);
   const [data, setData] = useState<IProduct | undefined>(undefined);
   const [dataCategory, setDataCategory] = useState<ILabelValue<string>[]>([]);
 
@@ -62,7 +61,6 @@ export default function EditProduct({
           }
           if (productData) {
             setData(productData as IProduct);
-            setEditorLoaded(true); // Assuming editor depends on this data
           } else {
             toast.error("Produk tidak ditemukan.");
             // router.push("/dashboard/product"); // Optional: redirect
@@ -92,24 +90,34 @@ export default function EditProduct({
         category_id: idCategory,
       };
 
-      // Only add gallery_images if it exists and has content
-      if (e.gallery_images && e.gallery_images.length > 0) {
-        try {
-          productData.gallery_images = JSON.stringify(e.gallery_images);
-          console.log("Added gallery_images to productData");
-        } catch (err) {
-          console.warn("Failed to stringify gallery_images:", err);
-        }
+      // Always update gallery_images (even if empty to clear existing data)
+      try {
+        productData.gallery_images =
+          e.gallery_images && e.gallery_images.length > 0
+            ? JSON.stringify(e.gallery_images)
+            : null; // Set to null to clear existing data
+        console.log(
+          "Updated gallery_images:",
+          productData.gallery_images ? "with data" : "cleared"
+        );
+      } catch (err) {
+        console.warn("Failed to process gallery_images:", err);
+        productData.gallery_images = null;
       }
 
-      // Only add images360 if it exists and has content
-      if (e.images360 && e.images360.length > 0) {
-        try {
-          productData.images360 = JSON.stringify(e.images360);
-          console.log("Added images360 to productData");
-        } catch (err) {
-          console.warn("Failed to stringify images360:", err);
-        }
+      // Always update images360 (even if empty to clear existing data)
+      try {
+        productData.images360 =
+          e.images360 && e.images360.length > 0
+            ? JSON.stringify(e.images360)
+            : null; // Set to null to clear existing data
+        console.log(
+          "Updated images360:",
+          productData.images360 ? "with data" : "cleared"
+        );
+      } catch (err) {
+        console.warn("Failed to process images360:", err);
+        productData.images360 = null;
       }
 
       const { error } = await supabase
@@ -428,25 +436,22 @@ export default function EditProduct({
                       </div>
 
                       {/* Editor untuk deskripsi */}
-                      {editorLoaded && (
-                        <div className="space-y-3">
-                          <label className="text-base font-medium text-gray-700 block">
-                            Spesifikasi & Detail Produk
-                          </label>
-                          <div className="text-sm text-gray-600 mb-3">
-                            Jelaskan spesifikasi teknis, manfaat, dan cara
-                            penggunaan alat kesehatan secara detail
-                          </div>
-                          <InputEditor
-                            editorLoaded={editorLoaded}
-                            name="description"
-                            onChange={(e) =>
-                              formik.setFieldValue("description", e)
-                            }
-                            value={formik.values.description}
-                          />
+                      <div className="space-y-3">
+                        <label className="text-base font-medium text-gray-700 block">
+                          Spesifikasi & Detail Produk
+                        </label>
+                        <div className="text-sm text-gray-600 mb-3">
+                          Jelaskan spesifikasi teknis, manfaat, dan cara
+                          penggunaan alat kesehatan secara detail
                         </div>
-                      )}
+                        <SafeCKEditor
+                          name="description"
+                          onChange={(content: string) =>
+                            formik.setFieldValue("description", content)
+                          }
+                          value={formik.values.description}
+                        />
+                      </div>
 
                       {/* Submit button - Mobile optimized */}
                       <div className="pt-4">
