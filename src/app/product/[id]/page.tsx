@@ -15,9 +15,18 @@ import { MdCheck, MdStarOutline, MdWhatsapp } from "react-icons/md";
 export default async function DetailProductPage({ params }: any) {
   const { id } = await params;
   const supabase = createClient();
-  const query = await (await supabase)
+  const query = await (
+    await supabase
+  )
     .from("product")
-    .select(`*, category (id, name)`)
+    .select(
+      `
+      *,
+      gallery_images,
+      images360,
+      category (id, name)
+    `
+    )
     .eq("id", id);
   const data: IProduct = query?.data ? query?.data[0] : undefined;
 
@@ -214,7 +223,6 @@ export default async function DetailProductPage({ params }: any) {
           </div>
         </div>{" "}
       </PageContainer>
-      <div className="h-16 sm:h-24 lg:h-32"></div>
       <FooterComponent />
     </div>
   );

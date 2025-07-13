@@ -151,14 +151,10 @@ export default function newProductPage() {
         category_id: idCategory.toString(),
       };
 
-      console.log("Form values received:", e);
-      console.log("Category ID resolved:", idCategory);
-
       // Only add gallery_images if it exists and has content
       if (e.gallery_images && e.gallery_images.length > 0) {
         try {
           productData.gallery_images = JSON.stringify(e.gallery_images);
-          console.log("Added gallery_images to productData");
         } catch (err) {
           console.warn("Failed to stringify gallery_images:", err);
         }
@@ -168,13 +164,10 @@ export default function newProductPage() {
       if (e.images360 && e.images360.length > 0) {
         try {
           productData.images360 = JSON.stringify(e.images360);
-          console.log("Added images360 to productData");
         } catch (err) {
           console.warn("Failed to stringify images360:", err);
         }
       }
-
-      console.log("Product data to insert:", productData);
 
       // Check for potential data issues
       const dataIssues = [];
@@ -185,23 +178,17 @@ export default function newProductPage() {
 
       if (dataIssues.length > 0) {
         setLoading(false);
-        console.error("Data validation failed:", dataIssues);
         toast.error(`Data tidak valid: ${dataIssues.join(", ")}`);
         return;
       }
 
-      // Try insert
+      // Insert product to database
       let insertAttempt;
       try {
-        console.log("Attempting insert with full data...");
-        console.log("Supabase client initialized:", !!supabase);
-
         insertAttempt = await supabase
           .from("product")
           .insert([productData])
           .select();
-
-        console.log("Insert attempt completed. Checking results...");
       } catch (error) {
         console.error("Exception during insert:", error);
         setLoading(false);
@@ -328,10 +315,6 @@ export default function newProductPage() {
     initialValues: initValue,
     onSubmit: (e) => handleCreate(e),
   });
-  // Debug formik values
-  useEffect(() => {
-    console.log("Current formik values:", formik.values);
-  }, [formik.values]);
 
   return (
     <DashboardLayout>
